@@ -1,0 +1,35 @@
+# Load packages -----------------------------------------------------------
+# install.packages("devtools")
+# devtools::install_github("VEZY/Vpalmr")
+packs <- c("lubridate", "stringr", 'tidyverse','viridis','Vpalmr','data.table','yaml')
+InstIfNec<-function (pack) {
+  if (!do.call(require,as.list(pack))) {
+    do.call(install.packages,as.list(pack))  }
+  do.call(require,as.list(pack)) }
+lapply(packs, InstIfNec)
+
+source('./1-code/helpers.R')
+source('./1-code/Mapping_light.R')
+
+
+# inputs ------------------------------------------------------------------
+
+paramFileName='Mockup_seed1_MAP_180'
+d_inter=12
+d_intra=5
+path_designs='./2-outputs/Run_simu/planting_designs/'
+pathVpalmParam='./2-outputs/Generate_VPalm_param/'
+pathArchimed='./1-code/archimed-phys.jar'
+pathVpalmJar='./1-code/vpalm_biomech.jar'
+pathOpf='./2-outputs/Run_simu/ops/opf/'
+pathOPS='./2-outputs/Run_simu/ops/'
+opfStepExport=14
+orientation='NS'
+
+RunSimu(d_inter=d_inter,d_intra=d_intra,onlyOPF=F,onlyArchimed=T,paramFileName=paramFileName,pathVpalmParam=pathVpalmParam,pathArchimed=pathArchimed,path_designs=path_designs,pathVpalmJar=pathVpalmJar,pathOpf=pathOpf,pathOPS=pathOPS,run_photosynthesis=T,opfStepExport=opfStepExport,overwrite =F,orientation=orientation)
+
+#### map
+
+Create_map(d_inter =d_inter ,d_intra = d_intra,path_designs = path_designs,paramFileName=paramFileName)
+  
+  

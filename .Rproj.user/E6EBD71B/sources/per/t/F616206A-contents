@@ -1,0 +1,285 @@
+
+# helpers -----------------------------------------------------------------
+
+
+# functions ---------------------------------------------------------------
+
+#' estimate plasticity (from Alvarez Prado S, Sadras VO, Borrás L. Independent genetic control of maize (Zea mays L.) kernel weight determination and its phenotypic plasticity. J Exp Bot. 2014;65(15):4479-4487. doi:10.1093/jxb/eru215)
+#'
+#' @param data data frame
+#' @param var variable in the df
+#' @param var_name name of the variable in the output df
+#'
+#' @return an output df with plasticity for each variety
+#' @export
+#'
+#' @examples
+#' 
+f.plast=function(data,var='var',var_name=''){
+  # data=rdt
+  # var='total_spik_fill'
+  
+  var_name=ifelse(var_name=='',var,var_name)
+  
+  # res=data%>%
+  #   mutate(trait=var_name)%>%
+  #   select(Variety,Treatment,Plant,trait,var)%>%
+  #   mutate(Varall=as.numeric(var(data%>%select(var),na.rm=T)))%>%
+  #   group_by(Variety,Varall,trait)%>%
+  #   summarize(varV=var(get(var),na.rm=T))%>%
+  #   ungroup()%>%
+  #   mutate(plast=varV/Varall)%>%
+  #   select(Variety,trait,plast)
+  
+  res=data%>%
+    mutate(trait=var_name)%>%
+    select(Variety,Treatment,Plant,trait,var)%>%
+    group_by(Treatment)%>%
+    mutate(Varall=as.numeric(var(data%>%select(var),na.rm=T)))%>%
+    ungroup()%>%
+    group_by(Variety,Treatment,Varall,trait)%>%
+    summarize(varV=var(get(var),na.rm=T))%>%
+    ungroup()%>%
+    mutate(plast=varV/Varall)%>%
+    select(Variety,Treatment,trait,plast)
+  
+  return(res)
+  
+}
+
+f.anovaTuckey=function(data=data,var='var',ylab=''){
+  
+  # data= height%>%
+  # filter(FL=='T' & Variety %in% Vprod)
+  # var='height_cm'
+  
+  # data=rdt
+  # var='total_spik_fill'
+  # ylab=''
+  ylab=ifelse(ylab=='',paste(var),ylab)
+  
+  mod=aov(data=data,formula =get(var) ~Variety*Treatment)
+  print('ANOVA TABLE')
+  print(summary(mod))
+  
+  
+  
+  ### plasticity
+  
+  plast=f.plast(data =data,var = var )
+  
+  
+  ### heritability (method anova)
+  # 1. Toker C. Estimates of broad-sense heritability for seed yield and yield criteria in faba bean (Vicia faba L.). Hereditas. 2004;140(3):222-225. doi:10.1111/j.1601-5223.2004.01780.x
+  
+  reps=data%>%
+    group_by(Variety,Treatment)%>%
+    summarize(n=n())%>%
+    ungroup()%>%
+    dplyr::select(n)
+  
+  rep=mean(reps$n,na.rm=T)
+  nbT=3
+  
+  
+  sigV=anova(mod)[["Mean Sq"]][1]/(nbT*rep)
+  sigT=anova(mod)[["Mean Sq"]][2]/rep
+  sigR=anova(mod)[["Mean Sq"]][4]
+  
+  sigP=sigV+sigT/nbT+sigR/(nbT*rep)
+  
+  h2_anova=round(sigV/sigP,2)
+  names(h2_anova)=var
+  
+  
+  ### heritability method lmer
+  # modelH2=lmer(data[,get(var)]~1+(1|Variety), REML=T,data = data)
+  # 
+  # VGeno=as.numeric(VarCorr(modelH2)$Variety)
+  # VResid=as.numeric(attr(VarCorr(modelH2),"sc"))^2
+  # 
+  # 
+  # h2=VGeno/(VGeno+VResid/rep)
+  
+  
+  
+  
+  modelTuckey<-aov(get(var)~group, data=data%>%
+                     mutate(group=paste(Treatment,Variety)))
+  
+  out <- HSD.test(modelTuckey,"group", group=TRUE,console=F,
+                  main="")
+  
+  res=data.frame(out$means)
+  resG=data.frame(out$groups)
+  colnames(res)[1]=var
+  colnames(resG)[1]=var
+  
+  donTV=merge(res%>%
+                mutate(group=row.names(data.frame(out$means))),resG)%>%
+    tidyr::separate(group,c('Treatment','Variety'))
+  
+  
+  
+  ##tableau
+  # print('TUCKEY TEST')
+  # print(donT%>%
+  # select(Treatment,Variety,var,std,groups))
+  
+  graphVT=ggplot()+
+    geom_boxplot(data=data,aes(x=paste(Treatment,Variety),y=get(var),group=paste(Treatment,Variety),col=Treatment),notch=F,outlier.colour=NA)+
+    geom_jitter(data=data,aes(x=paste(Treatment,Variety),y=get(var),group=paste(Treatment,Variety),col=Treatment),height=0)+
+    geom_text(data=donTV,aes(x=paste(Treatment,Variety),y=1.1*get(var)+1.8*std,label=groups,col=Treatment))+
+    # facet_grid(~Variety)+
+    scale_color_manual(name='Treatment',values = color_Trt)+
+    ylab(ylab)+
+    xlab('')
+  
+  ### tuckey for each treatment
+  donT_all=NULL
+  for (t in unique(data$Treatment)){
+    modelTuckeyT<-aov(get(var)~Variety, data=data%>%
+                        filter(Treatment==t))
+    
+    outV <- HSD.test(modelTuckeyT,"Variety", group=TRUE,console=F,
+                     main="")
+    
+    resV=data.frame(outV$means)
+    resGV=data.frame(outV$groups)
+    colnames(resV)[1]=var
+    colnames(resGV)[1]=var
+    
+    donT=merge(resV%>%
+                 mutate(Treatment=t,
+                        Variety=row.names(data.frame(outV$means))),resGV)
+    
+    donT_all=rbind(donT_all,donT)
+    
+    
+  }
+  
+  
+  graphT=
+    ggplot()+
+    geom_boxplot(data=data,aes(x=Variety,y=get(var),group=paste(Variety,Treatment),col=Variety),notch=F,outlier.colour=NA)+
+    geom_jitter(data=data,aes(x=Variety,y=get(var),group=paste(Variety,Treatment),col=Variety),height=0)+
+    geom_text(data=donT_all,aes(x=Variety,y=1.1*get(var)+1.8*std,label=groups,col=Variety))+
+    facet_grid(~Treatment)+
+    # scale_color_manual(name='Variety',values = color_Trt)+
+    ylab(ylab)+
+    xlab('')
+  
+  
+  ### tuckey for each variety
+  donV_all=NULL
+  for (v in unique(data$Variety)){
+    modelTuckeyV<-aov(get(var)~Treatment, data=data%>%
+                        filter(Variety==v))
+    
+    outV <- HSD.test(modelTuckeyV,"Treatment", group=TRUE,console=F,
+                     main="")
+    
+    resV=data.frame(outV$means)
+    resGV=data.frame(outV$groups)
+    colnames(resV)[1]=var
+    colnames(resGV)[1]=var
+    
+    donV=merge(resV%>%
+                 mutate(Variety=v,
+                        Treatment=row.names(data.frame(outV$means))),resGV)
+    
+    donV_all=rbind(donV_all,donV)
+    
+  }
+  
+  
+  donV_all=donV_all%>%
+    group_by(Variety)%>%
+    arrange(Variety,Treatment)%>%
+    mutate(groupC=first(groups))%>%
+    ungroup()%>%
+    mutate(sig=ifelse(test = str_detect(string = groups,pattern = groupC),yes = 'ns',no = '*'))
+  
+  # 
+  
+  graphV=
+    ggplot()+
+    geom_boxplot(data=data,aes(x=Treatment,y=get(var),group=paste(Treatment,Variety),col=Treatment),notch=F,outlier.colour=NA)+
+    geom_jitter(data=data,aes(x=Treatment,y=get(var),group=paste(Treatment,Variety),col=Treatment),height=0)+
+    geom_text(data=donV_all,aes(x=Treatment,y=1.1*get(var)+1.8*std,label=groups,col=Treatment))+
+    facet_grid(~Variety)+
+    scale_color_manual(name='Treatment',values = color_Trt)+
+    ylab(ylab)+
+    xlab('')
+  
+  
+  
+  # output=list(anova=summary(mod),
+  #             TuckeyVT=donT,graphVT=graphVT,TuckeyV=donTV_all,graphV=graphV)
+  
+  
+  
+  
+  
+  output=list(anova=summary(mod),h2=h2_anova,plast=plast,
+              TuckeyVT=donTV,TuckeyT=donT_all,graphVT=graphVT,graphT=graphT,graphV=graphV)
+  
+  return(output)
+}
+
+f.tableSig=function(data=data,var='var',var_name='var'){
+  
+  
+  # data=rdt
+  # var='total_spik_fill'
+  
+  
+  ### tuckey for each variety
+  donV_all=NULL
+  for (v in unique(data$Variety)){
+    modelTuckeyV<-aov(get(var)~Treatment, data=data%>%
+                        filter(Variety==v))
+    
+    outV <- HSD.test(modelTuckeyV,"Treatment", group=TRUE,console=F,
+                     main="")
+    
+    resV=data.frame(outV$means)
+    resGV=data.frame(outV$groups)
+    colnames(resV)[1]=var
+    colnames(resGV)[1]=var
+    
+    donV=merge(resV%>%
+                 mutate(Variety=v,
+                        Treatment=row.names(data.frame(outV$means))),resGV)
+    
+    donV_all=rbind(donV_all,donV)
+    
+  }
+  
+  
+  donV_all=donV_all%>%
+    mutate(max=max(get(var)),
+           min=min(get(var)),
+           rel=(get(var)-min)/(max-min))%>%
+    group_by(Variety)%>%
+    arrange(Variety,Treatment)%>%
+    mutate(groupC=first(groups),
+           groupD=nth(x = groups, n = 2),
+           valC=first(get(var)),
+           valD=nth(x = get(var), n = 2)
+    )%>%
+    ungroup()%>%
+    mutate(devC=(get(var)-valC)/valC,
+           sigC=ifelse(test = str_detect(string = groups,pattern = groupC)| str_detect(string = groupC,pattern = groups),yes = '',no = '*c'),
+           sigC=ifelse(Treatment=='C','',sigC),
+           sigAF=ifelse(test =  str_detect(string = groups,pattern = groupD)| str_detect(string = groupD,pattern = groups),yes = '',no = '*af'),
+           sigAF=ifelse(Treatment %in% c('C','D'),'',sigAF),
+           mean=get(var),
+           trait=var_name)%>%
+    select(Treatment,Variety,trait,mean,std,max,min,rel,groups,devC,sigC,sigAF)
+  
+  return(donV_all)
+}
+
+# str_detect(string = 'a',pattern = "ab")| str_detect(string = 'ab',pattern = "a")
+# str_locate(string = 'abc',pattern = "abcd")

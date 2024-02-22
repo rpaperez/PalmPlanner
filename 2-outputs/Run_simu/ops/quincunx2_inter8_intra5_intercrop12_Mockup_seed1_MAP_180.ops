@@ -1,0 +1,6 @@
+# T xmin ymin zmin xmax ymax flat
+T 0 0 0 20 5 flat
+#[Archimed] elaeis
+#sceneId objectId FilePath x y z scale inclinationAzimut inclinationAngle rotation
+1	1	opf/Mockup_seed1_MAP_180.opf	4	1.25	0	1	0	0	0
+1	2	opf/Mockup_seed1_MAP_180.opf	16	3.75	0	1	0	0	0

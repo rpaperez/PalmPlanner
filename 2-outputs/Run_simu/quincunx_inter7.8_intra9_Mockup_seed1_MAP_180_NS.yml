@@ -1,0 +1,106 @@
+scene: ops/quincunx_inter7.8_intra9_Mockup_seed1_MAP_180.ops
+models:
+- models/plant_elaeis.yml
+- soil.yml
+meteo: meteo.csv
+meteo_range: 1, 28
+scene_rotation: 0
+sky_sectors: 16
+all_in_turtle: yes
+radiation_timestep: 5
+scattering: yes
+pixel_size: 3
+toricity: yes
+cache_pixel_table: no
+cache_radiation: no
+output_directory: output
+simulation_directory: quincunx_inter7.8_intra9_Mockup_seed1_MAP_180_NS
+write_summary: yes
+export_ops: '14'
+component_variables:
+  step_number: yes
+  step_duration: yes
+  item_id: yes
+  component_id: yes
+  group: yes
+  type: yes
+  area: yes
+  surface_hits: yes
+  barycentre_x: yes
+  barycentre_y: yes
+  barycentre_z: yes
+  sky_fraction: no
+  Ri_PAR_0_f: yes
+  Ri_PAR_0_q: yes
+  Ri_NIR_0_f: yes
+  Ri_NIR_0_q: yes
+  Ri_PAR_f: yes
+  Ri_NIR_f: yes
+  Ri_TIR_f: yes
+  Ri_PAR_q: yes
+  Ri_NIR_q: yes
+  Ri_TIR_q: yes
+  Ra_PAR_0_f: yes
+  Ra_NIR_0_f: yes
+  Ra_PAR_0_q: yes
+  Ra_NIR_0_q: yes
+  Ra_PAR_f: yes
+  Ra_NIR_f: yes
+  Ra_TIR_f: yes
+  Ra_PAR_q: yes
+  Ra_NIR_q: yes
+  Ra_TIR_q: yes
+  An_f: yes
+  An_q: yes
+  Gs: yes
+  H_q: yes
+  H_f: yes
+  LE_q: yes
+  LE_f: yes
+  Tr_f: yes
+  Tr_q: yes
+  T: yes
+opf_variables:
+  step_number: yes
+  step_duration: yes
+  item_id: yes
+  component_id: yes
+  group: yes
+  type: yes
+  area: yes
+  surface_hits: yes
+  barycentre_x: yes
+  barycentre_y: yes
+  barycentre_z: yes
+  sky_fraction: no
+  Ri_PAR_0_f: yes
+  Ri_PAR_0_q: yes
+  Ri_NIR_0_f: yes
+  Ri_NIR_0_q: yes
+  Ri_PAR_f: yes
+  Ri_NIR_f: yes
+  Ri_TIR_f: yes
+  Ri_PAR_q: yes
+  Ri_NIR_q: yes
+  Ri_TIR_q: yes
+  Ra_PAR_0_f: no
+  Ra_NIR_0_f: no
+  Ra_PAR_0_q: no
+  Ra_NIR_0_q: no
+  Ra_PAR_f: no
+  Ra_NIR_f: no
+  Ra_TIR_f: no
+  Ra_PAR_q: no
+  Ra_NIR_q: no
+  Ra_TIR_q: no
+  An_f: no
+  An_q: no
+  Gs: no
+  H_q: no
+  H_f: no
+  LE_q: no
+  LE_f: no
+  Tr_f: no
+  Tr_q: no
+  T: no
+opf_overwrite_variables: yes
