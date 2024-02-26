@@ -25,69 +25,73 @@ The objective of this work is to provide a decision support tool that allows for
 
 Here we propose to compile a list of all the designs suggested by farmers in the Optipalmex project. The designs put forward are either in a quincunx or square layout. These designs can be characterized by two parameters: inter-row and intra-row distances.
 
-Other designs involve multiple rows of palms (defined by inter-row and intra-row distances), along with the incorporation of intercropping lines for food, fruit, or tree crops. An additional parameter (intercropping distance) determines the spacing between these multiple palm rows. In this design approach, farmers have suggested twin row, triple row, quadruple row, and quintuple row layouts. All these designs are structured based on a quincunx arrangement within the palm rows.
+Other designs involve multiple rows of palms (defined by inter-row and intra-row distances), along with the incorporation of intercropping lines for food, fruit, or tree crops. An additional parameter (intercropping distance) determines the spacing between these multiple palm rows. In this design approach, farmers have suggested twin row, triple row, quadruple row, and quintuple row layouts. All these designs are structured based on a quincunx arrangement within the palm rows. The grey circules indicate old planting positions of a conventional 9 x 9 quincunx design.
 
 ```{r packages,echo=FALSE,include=FALSE}
 
-
-
 source('./1-code/helpers.R')
 source('./1-code/Generate_designs.R')
+source('1-code/Mapping_light.R')
+path_designs='2-outputs/Run_simu/planting_designs/'
+MAP=90
+paramFileName=paste0('DA1_Average_MAP_',MAP)
 ```
 
 ## Quincunx designs (Triangulo)
 
-### T 9m x 9m
-Here is an exemple of the reference design with a 9 x 9 quincunx design. The paramteres are inter-row distance = 7.8 m and intra-row distance = 9m. Both orientations North-South and East-West are presented.
+### Intra-row = 9m & Inter-row = 7.8m. (T 9m x 9m)
+Here is an example of the reference design with a 9 x 9 quincunx design. The paramteres are inter-row distance = 7.8 m and intra-row distance = 9m. Both orientations North-South and East-West are presented.
 
 
-```{r quinconx base, echo=FALSE,warning=FALSE,message=FALSE}
+```{r quinconx base, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
+
 ##### Simple quincunx design
 l=9
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
+designType='quincunx'
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = 'NS',pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
 
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = h,designType = 'quincunx',orientation = "NS",pointSize = 3)$plot
-
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = h,designType = 'quincunx',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "EW",pointSize = 3)$plot
 
 plot_grid(a1,a2,ncol=2)
-
+plot_grid(m1$plot,m1$plot,ncol=2)
 ```
 
-### T 11m x 11m
+### Intra-row = 11m & Inter-row = 9.5m. (T 11m x 11m)
 Here is another example of quincunx design with a 11 x 11 m. The paramteres are inter-row distance = 9.5 m and intra-row distance = 11m. The density is thus reduced to 95 palms per hectare
 
-```{r quinconx base2, echo=FALSE,warning=FALSE,message=FALSE}
-
+```{r quinconx base2, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 ##### Simple quincunx design
 l=11
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
 
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = h,designType = 'quincunx',orientation = "NS",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "NS",pointSize = 3)$plot
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = h,designType = 'quincunx',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "EW",pointSize = 3)$plot
 
 plot_grid(a1,a2,ncol=2)
 
 ```
 
 
-### T 18m x 18m
-A quincunx design  a 18 x 18 m reduced sharply the density to 35 palms per hectare
+### Intra-row = 18m & Inter-row = 15.6m. (T 18m x 18m)
+A quincunx design 18 x 18 m reduced sharply the density to 35 palms per hectare
 
 
-```{r quinconx base3, echo=FALSE,warning=FALSE,message=FALSE}
+```{r quinconx base3, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=18
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
 
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = h,designType = 'quincunx',orientation = "NS",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = h,designType = 'quincunx',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "EW",pointSize = 3)$plot
 
 plot_grid(a1,a2,ncol=2)
-
+plot_grid(m1$plot,m1$plot,ncol=2)
 ```
 
 
@@ -95,9 +99,9 @@ plot_grid(a1,a2,ncol=2)
 
 The following designs are squared layout with the different distances proposed by the farmers
 
-### C 9m x 8m
+### Intra-row = 9 & Inter-row = 8m. (C 9m x 8m)
 
-```{r square, echo=FALSE,warning=FALSE,message=FALSE}
+```{r square, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
 h=8
@@ -111,9 +115,9 @@ plot_grid(a1,a2,ncol=2)
 ```
 
 
-### C 9m x 9m
+### Intra-row = 9m & Inter-row = 9m. (C 9m x 9m)
 
-```{r square2, echo=FALSE,warning=FALSE,message=FALSE}
+```{r square2, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
 h=9
@@ -127,9 +131,9 @@ plot_grid(a1,a2,ncol=2)
 ```
 
 
-### C 9m x 11m
+### Intra-row = 9m & Inter-row = 11m. (C 9m x 11m)
 
-```{r square3, echo=FALSE,warning=FALSE,message=FALSE}
+```{r square3, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
 h=11
@@ -142,9 +146,9 @@ plot_grid(a1,a2,ncol=2)
 
 ```
 
-### C 12m x 12m
+### Intra-row = 12m & Inter-row = 12m. (C 12m x 12m)
 
-```{r square4, echo=FALSE,warning=FALSE,message=FALSE}
+```{r square4, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=12
 h=12
@@ -159,13 +163,13 @@ plot_grid(a1,a2,ncol=2)
 
 ## Twin-row designs 
 
-The following designs feature a twin-row layout. Each design is described as a combination of intra-row x inter-row x intercropping distances.
+The following designs feature a twin-row layout. Each design is described as a combination of palms rows (in quincunx T or in square C) x intercropping distances.
 
-### 2(T 9 X 9) X 15.6 m
+### 2T (Intra-row = 9m & Inter-row = 7.8m) & Intercropping= 15.6 m
 
 This design is the 9 x 9 m quincunx layout with one row out of three removed.
 
-```{r twin1, echo=FALSE,warning=FALSE,message=FALSE}
+```{r twin1, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
 h=sqrt(3*(l**2)/4)
@@ -180,11 +184,65 @@ plot_grid(a1,a2,ncol=2)
 
 ```
 
+### 2T (Intra-row = 9m & Inter-row = 6.8m) & Intercropping= 16.6 m
 
-### 2(T 9 X 9) X 12 m
+```{r twin2, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
- The intercorpping distance can be adapted to increase oil palm density.
-```{r twin2, echo=FALSE,warning=FALSE,message=FALSE}
+l=9
+h=6.8
+i=16.6
+  
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+
+
+plot_grid(a1,a2,ncol=2)
+
+```
+
+### 2T (Intra-row = 9m & Inter-row = 6m) & Intercropping= 17.4 m
+
+```{r twin3, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
+
+l=9
+h=6
+i=17.4
+  
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+
+
+plot_grid(a1,a2,ncol=2)
+
+```
+
+
+### 2T (Intra-row = 8m & Inter-row = 6.9m) & Intercropping= 16.5 m
+
+```{r twin4, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
+
+l=8
+h=sqrt(3*(l**2)/4)
+i=16.5
+  
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+
+
+plot_grid(a1,a2,ncol=2)
+
+```
+
+
+### 2T (Intra-row = 9m & Inter-row =7.8m) & Intercropping= 12 m
+
+The intercorpping distance can be adapted to increase oil palm density. Not prossible in replanting aerea
+
+
+```{r twin5, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
 h=sqrt(3*(l**2)/4)
@@ -199,47 +257,51 @@ plot_grid(a1,a2,ncol=2)
 
 ```
 
+### 2C (Intra-row = 9m & Inter-row =7.8m) & Intercropping= 12 m
 
-### 2(T 8 X 8) X 12 m
+With a 12m intercropping distance, a twin-row design with a square layout can be better adapted in replanting area
 
-```{r twin3, echo=FALSE,warning=FALSE,message=FALSE}
 
-l=8
-h=8
+```{r twin6, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
+
+l=9
+h=sqrt(3*(l**2)/4)
 i=12
   
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'square2',orientation = "NS",pointSize = 3)$plot
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'square2',orientation = "EW",pointSize = 3)$plot
 
 
 plot_grid(a1,a2,ncol=2)
 
 ```
 
-### 2(9 X 12) X 12 m
+### 2C (Intra-row = 12m & Inter-row = 9m) & Intercropping= 12m. 
 
-```{r twin4, echo=FALSE,warning=FALSE,message=FALSE}
+
+```{r twinS, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=12
 h=9
 i=12
   
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'square2',orientation = "NS",pointSize = 3)$plot
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'square2',orientation = "EW",pointSize = 3)$plot
 
 
 plot_grid(a1,a2,ncol=2)
 
 ```
+
 
 ## Triple-row designs
 
-### 3(9 X 7.8) X 15.6 m
+### 3T (Intra-row = 9m & Inter-row = 7.8m) & Intercropping= 15.6m. 
 This design is the 9 x 9 m quincunx layout with one row out of four removed.
 
-```{r triple1, echo=FALSE,warning=FALSE,message=FALSE}
+```{r triple1, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
 h=sqrt(3*(l**2)/4)
@@ -255,13 +317,14 @@ plot_grid(a1,a2,ncol=2)
 ```
 
 
-### 3(9 X 7.8) X 12 m
+### 3T (Intra-row = 9m & Inter-row = 6.8m) & Intercropping= 17.6m. 
 
-```{r triple2, echo=FALSE,warning=FALSE,message=FALSE}
+
+```{r triple2, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
-h=sqrt(3*(l**2)/4)
-i=12
+h=6.8
+i=17.6
   
 a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx3',orientation = "NS",pointSize = 3)$plot
 
@@ -271,32 +334,14 @@ a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType =
 plot_grid(a1,a2,ncol=2)
 
 ```
-
-
-### 3(8 X 8) X 12 m
-
-```{r triple3, echo=FALSE,warning=FALSE,message=FALSE}
-
-l=8
-h=8
-i=12
-  
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx3',orientation = "NS",pointSize = 3)$plot
-
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx3',orientation = "EW",pointSize = 3)$plot
-
-
-plot_grid(a1,a2,ncol=2)
-
-```
-
 
 ## Quadruple-row designs
 
-### 4(9 X 7.8) X 15.6 m
+### 4T (Intra-row = 9m & Inter-row = 7.8m) & Intercropping= 15.6m. 
+
 This design is the 9 x 9 m quincunx layout with one row out of five removed.
 
-```{r quadruple1, echo=FALSE,warning=FALSE,message=FALSE}
+```{r quadruple1, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
 h=sqrt(3*(l**2)/4)
@@ -311,49 +356,15 @@ plot_grid(a1,a2,ncol=2)
 
 ```
 
-
-### 4(9 X 7.8) X 12 m
-
-```{r quadruple2, echo=FALSE,warning=FALSE,message=FALSE}
-
-l=9
-h=sqrt(3*(l**2)/4)
-i=12
-  
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx4',orientation = "NS",pointSize = 3)$plot
-
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx4',orientation = "EW",pointSize = 3)$plot
-
-
-plot_grid(a1,a2,ncol=2)
-
-```
-
-
-### 4(8 X 8) X 12 m
-
-```{r quadruple3, echo=FALSE,warning=FALSE,message=FALSE}
-
-l=8
-h=8
-i=12
-  
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx4',orientation = "NS",pointSize = 3)$plot
-
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx4',orientation = "EW",pointSize = 3)$plot
-
-
-plot_grid(a1,a2,ncol=2)
-
-```
 
 
 ## Quintuple-row designs
 
-### 5(9 X 7.8) X 15.6 m
+### 5T (Intra-row = 9m & Inter-row = 7.8m) & Intercropping= 15.6m. 
+
 This design is the 9 x 9 m quincunx layout with one row out of six removed.
 
-```{r quintuple1, echo=FALSE,warning=FALSE,message=FALSE}
+```{r quintuple1, echo=FALSE,warning=FALSE,}
 
 l=9
 h=sqrt(3*(l**2)/4)
@@ -368,38 +379,3 @@ plot_grid(a1,a2,ncol=2)
 
 ```
 
-
-### 5(9 X 7.8) X 12 m
-
-```{r quintuple2, echo=FALSE,warning=FALSE,message=FALSE}
-
-l=9
-h=sqrt(3*(l**2)/4)
-i=12
-  
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx5',orientation = "NS",pointSize = 3)$plot
-
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx5',orientation = "EW",pointSize = 3)$plot
-
-
-plot_grid(a1,a2,ncol=2)
-
-```
-
-
-### 5(8 X 8) X 12 m
-
-```{r quintuple3, echo=FALSE,warning=FALSE,message=FALSE}
-
-l=8
-h=8
-i=12
-  
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx5',orientation = "NS",pointSize = 3)$plot
-
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx5',orientation = "EW",pointSize = 3)$plot
-
-
-plot_grid(a1,a2,ncol=2)
-
-```

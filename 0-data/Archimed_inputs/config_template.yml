@@ -10,7 +10,7 @@ meteo: meteo.csv # Path to the meteo file
 meteo_range: 1, 28 # use only steps from 2 to 3 (inclusive, start from 1) in meteo file
 #meteo_range: 2016/07/01 8:00:00, 2016/07/01 12:00:00       # use only steps between given date/time
 scene_rotation: 0 # Rotation of the scene from the North axe (degrees)
-sky_sectors: 16 # Must be either 1, 6, 16, 46, 136 or 406
+sky_sectors: 46 # Must be either 1, 6, 16, 46, 136 or 406
 all_in_turtle: true # false: direct radiation is computed using the true sun position; true: direct radiation is computed using sky sectors
 radiation_timestep: 5 # [minutes] frequency for the computation of the sun's radiation within each timestep
 scattering: true # true: compute multiple scattering

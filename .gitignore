@@ -1,1 +1,7 @@
-/2-outputs
+2-outputs/
+.Rproj.user/
+*.opf
+*.ops
+*.pper
+*.csv
+0-data/Archimed_inputs/.DS_Store

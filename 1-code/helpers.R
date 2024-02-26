@@ -542,8 +542,8 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   if (designType %in% c('square','quincunx')){
     dist_intercrop=0}
   # number of raow and columns in 1 ha
-  repRows=ceiling(100/dist_inter+dist_intercrop)
-  repCol=ceiling(100/dist_intra)
+  repRows=ceiling(lim/dist_inter+dist_intercrop)
+  repCol=ceiling(lim/dist_intra)
   
   # number of raow and columns in 1 ha
   
@@ -581,7 +581,7 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
     ylab('Intra row distance (m)')+
     xlab('Inter row distance (m)')+
     xlim(c(0,100))+
-    ylim(c(0,100))+
+    ylim(c(0,lim))+
     ggtitle(paste(density,' plants.ha-1'))+
     coord_equal()+
     myTheme
@@ -593,8 +593,8 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
       ggplot2::geom_point(shape=8,col='forestgreen',size=pointSize)+
       xlab('Intra row distance (m)')+
       ylab('Inter row distance (m)')+
-      xlim(c(0,100))+
-      ylim(c(0,100))+
+      xlim(c(0,lim))+
+      ylim(c(0,lim))+
       ggtitle(paste(density,' plants.ha-1'))+
       coord_equal()+
       myTheme
@@ -633,7 +633,7 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
 #' @param dist_intra distance within row of palm trees (m)
 #' @param dist_inter distance between rows of palm trees (m)
 #' @param dist_intercrop distance between multiple rows of palm trees (m), for intercropping 
-#' @param designType type of design (square,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
+#' @param designType type of design (square,square2,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
 #' @return ops file
 #' @export
 #'
@@ -821,7 +821,7 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
 #'@param d_inter: distance between rows of palm trees
 #'@param d_intra: distance within rows of palm trees
 #'@param d_intercrop: distance for intercrop
-#' @param designType type of design (square,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
+#' @param designType type of design (square,square2,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
 #' @param pathVpalmParam path to paramFileName
 #' @param  path_designs path to save planting designs
 #' @param pathArchimed path to archimed jar
@@ -855,7 +855,7 @@ RunSimu=function(MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop
   # run_photosynthesis=F
   # overwrite=T
   
-  paramFileName=paste0('Mockup_seed1_MAP_',MAP)
+  paramFileName=paste0('DA1_Average_MAP_',MAP)
   
   if (designType %in% c('square','quincunx')){
     design_name=paste0(designType,'_inter',d_inter,'_intra',d_intra)
@@ -877,19 +877,23 @@ RunSimu=function(MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop
     
     print(paste("Running simulation:",foldSim))
     
+
+# !!!!! to recode ---------------------------------------------------------
+
+    
     # generate Vpalm Parameters -----------------------------------------------
   
-    if(!paste0(paramFileName,'.txt') %in% list.files(path = pathVpalmParam,pattern = 'txt')){
-      print(paste0('writting VPalm parameter file: ',pathVpalmParam,paramFileName,'.txt'))
-      Generate_Vpalm_param(MAP_requested =MAP)
-    }
-    
-    # generate opf ------------------------------------------------------------
-  
-    if(!paste0(paramFileName,'.opf') %in% list.files(path = pathOpf,pattern = 'opf')){
-      print(paste0('creating opf: ',pathOpf,paramFileName,'.opf'))
-      system(command = paste0('java -jar ',pathVpalmJar,' ',pathVpalmParam,paramFileName,'.txt',' ',pathOpf,paramFileName,'.opf'))
-    }
+    # if(!paste0(paramFileName,'.txt') %in% list.files(path = pathVpalmParam,pattern = 'txt')){
+    #   print(paste0('writting VPalm parameter file: ',pathVpalmParam,paramFileName,'.txt'))
+    #   Generate_Vpalm_param(MAP_requested =MAP)
+    # }
+    # 
+    # # generate opf ------------------------------------------------------------
+    # 
+    # if(!paste0(paramFileName,'.opf') %in% list.files(path = pathOpf,pattern = 'opf')){
+    #   print(paste0('creating opf: ',pathOpf,paramFileName,'.opf'))
+    #   system(command = paste0('java -jar ',pathVpalmJar,' ',pathVpalmParam,paramFileName,'.txt',' ',pathOpf,paramFileName,'.opf'))
+    # }
   
       
     # generate ops ------------------------------------------------------------
@@ -899,6 +903,7 @@ RunSimu=function(MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop
     ## save planting design
     print('saving planting design')
     p_design=generate_design(dist_inter =d_inter, dist_intra=d_intra,dist_intercrop =d_intercrop,designType = designType ,orientation = orientation,pointSize = 3)$result
+    
     data.table::fwrite(x=p_design,file = paste0(path_designs,design_name,'.csv'))
     
     # generate config file ----------------------------------------------------
@@ -906,6 +911,10 @@ RunSimu=function(MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop
     ##"load template
     
     configYml=read_yaml(file =  '0-data/Archimed_inputs/config_template.yml')
+    
+    configYml$meteo='meteoCampecheFormated.csv'
+    configYml$meteo_range='1, 12'
+    configYml$export_ops=6
     
     ## change names & dirs
     opsName=paste0(design_name,'_',paramFileName,'.ops')

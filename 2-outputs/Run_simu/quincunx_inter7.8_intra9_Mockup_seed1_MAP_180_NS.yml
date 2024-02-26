@@ -2,10 +2,10 @@ scene: ops/quincunx_inter7.8_intra9_Mockup_seed1_MAP_180.ops
 models:
 - models/plant_elaeis.yml
 - soil.yml
-meteo: meteo.csv
-meteo_range: 1, 28
+meteo: meteoCampecheFormated.csv
+meteo_range: 1, 12
 scene_rotation: 0
-sky_sectors: 16
+sky_sectors: 46
 all_in_turtle: yes
 radiation_timestep: 5
 scattering: yes
@@ -16,7 +16,7 @@ cache_radiation: no
 output_directory: output
 simulation_directory: quincunx_inter7.8_intra9_Mockup_seed1_MAP_180_NS
 write_summary: yes
-export_ops: '14'
+export_ops: '6'
 component_variables:
   step_number: yes
   step_duration: yes

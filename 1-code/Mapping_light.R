@@ -25,12 +25,13 @@ if (require('archimedR')==F){
 #' @param designType type of design (square,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
 #' @param paramFileName name of the Vpalm param file (.txt)
 #' @param orientation orientation of the scene (NS: North-South or EW: East-West)
+#' @param lim limit of the area for plotting map (m)
 #'
 #' @return map of transmitted light to the ground
 #' @export csv file of the map
 #'
 #' @examples
-Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop,path_designs=path_designs,paramFileName=paramFileName,orientation=orientation){
+Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop,path_designs=path_designs,paramFileName=paramFileName,orientation=orientation,lim=50){
   
   # d_inter=10
   # d_intra=5
@@ -51,8 +52,8 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
   
   
   ### checking for existing map
-  existing_files=list.files(path ='./2-outputs/Mapping_Light',pattern = '.csv',full.names = T)
-  fileMap=paste0('./2-outputs/Mapping_Light/',paramFileName,'_',design_name,'_',orientation,'.csv')
+  existing_files=list.files(path ='2-outputs/Mapping_Light',pattern = '.csv',full.names = T)
+  fileMap=paste0('2-outputs/Mapping_Light/',paramFileName,'_',design_name,'_',orientation,'.csv')
   
   if (!(fileMap %in% existing_files)){
     
@@ -61,7 +62,7 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
     ###archimed outputs
 
     
-    sim_folder=paste0('./2-outputs/Run_simu/output/',design_name,'_',paramFileName,'_',orientation)
+    sim_folder=paste0('2-outputs/Run_simu/output/',design_name,'_',paramFileName,'_',orientation,'/')
     
     files_sim= 
       sim_folder%>%
@@ -78,7 +79,10 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
     
     
     ###conversion factor W.m-2.30mn of GR-->MJ.m-2.day-1 of PAR
-    conMJday=0.48*1800*10**-6
+    # conMJday=0.48*1800*10**-6
+    
+    ###conversion factor W.m-2.60mn of GR-->MJ.m-2.day-1 of PAR
+    conMJday=0.48*3600*10**-6
     
     ##"incident PAR in MJ.m-2.day-1
     PARinc=as.numeric(meteo%>%
@@ -150,13 +154,15 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
       .[rep(1,length(found)),]%>%
       mutate(Design= grid_dim$Design[grep(x,grid_dim$Design)])
     
-    ## get 4 trees positions to be generic
+    ## get 5 trees positions to be generic
     nbT=(length(trees_positions)-1)/2
     trees_positions=trees_positions%>%
       mutate(x3=ifelse(nbT>2,x3,NA),
              x4=ifelse(nbT>3,x4,NA),
+             x5=ifelse(nbT>4,x5,NA),
              y3=ifelse(nbT>2,y3,NA),
-             y4=ifelse(nbT>3,y4,NA))
+             y4=ifelse(nbT>3,y4,NA),
+             y5=ifelse(nbT>4,y5,NA))
     
     
     grid_dist= 
@@ -165,16 +171,19 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
              dist_tree_2= sqrt((x - x2)^2 + (y - y2)^2),
              dist_tree_3= sqrt((x - x3)^2 + (y - y3)^2),
              dist_tree_4= sqrt((x - x4)^2 + (y - y4)^2),
+             dist_tree_5= sqrt((x - x5)^2 + (y - y5)^2),
              dist_tree_x1= abs(x - x1),
              dist_tree_x2= abs(x - x2),
              dist_tree_x3= abs(x - x3),
              dist_tree_x4= abs(x - x4),
+             dist_tree_x5= abs(x - x5),
              x_tree_1= x1, x_tree_2= x2,
              x_tree_3= x3, x_tree_4= x4,
+             x_tree_5= x5,
              y_tree_1=y1,y_tree_2=y2,
-             y_tree_3=y3,y_tree_4=y4)%>%
-      mutate(dist_tree= pmin(dist_tree_1,dist_tree_2,dist_tree_3,dist_tree_4),
-             dist_tree_x= pmin(dist_tree_x1,dist_tree_x2,dist_tree_x3,dist_tree_x4))
+             y_tree_3=y3,y_tree_4=y4,y_tree_5=y5)%>%
+      mutate(dist_tree= pmin(dist_tree_1,dist_tree_2,dist_tree_3,dist_tree_4,dist_tree_5,na.rm = T),
+             dist_tree_x= pmin(dist_tree_x1,dist_tree_x2,dist_tree_x3,dist_tree_x4,dist_tree_5,na.rm = T))
     
     
     plane_df= 
@@ -217,17 +226,25 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
                 x_tree_2= unique(x_tree_2),
                 x_tree_3= unique(x_tree_3), 
                 x_tree_4= unique(x_tree_4),
+                x_tree_5= unique(x_tree_5),
                 y_tree_1= unique(y_tree_1), 
                 y_tree_2= unique(y_tree_2),
                 y_tree_3= unique(y_tree_3), 
-                y_tree_4= unique(y_tree_4))%>%
+                y_tree_4= unique(y_tree_4),
+                y_tree_5= unique(y_tree_5))%>%
       ungroup()
     
     reps=NULL
     
-    nbReps=6  
-    for (r_x in 0:nbReps){
-      for (r_y in 0:nbReps){
+    if (designType %in% c('square','quincunx')){
+      d_intercrop=0}
+  
+    
+    repRows=ceiling(lim/(d_inter+d_intercrop))
+    repCol=ceiling(lim/d_intra)
+    
+    for (r_x in 0:repRows){
+      for (r_y in 0:repCol){
         
         # print(paste('r_x:',r_x,' r_y:',r_y))
         
@@ -239,12 +256,14 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
                  y=y+r_y*ymax,
                  x_tree_1=x_tree_1+r_x*xmax,
                  x_tree_2=x_tree_2+r_x*xmax,
-                 # x_tree_3=x_tree_3+r_x*xmax,
-                 # x_tree_4=x_tree_4+r_x*xmax,
+                 x_tree_3=x_tree_3+r_x*xmax,
+                 x_tree_4=x_tree_4+r_x*xmax,
+                 x_tree_5=x_tree_5+r_x*xmax,
                  y_tree_1=y_tree_1+r_y*ymax,
-                 y_tree_2=y_tree_2+r_y*ymax
-                 # y_tree_3=y_tree_3+r_y*ymax,
-                 # y_tree_4=y_tree_4+r_y*ymax
+                 y_tree_2=y_tree_2+r_y*ymax,
+                 y_tree_3=y_tree_3+r_y*ymax,
+                 y_tree_4=y_tree_4+r_y*ymax,
+                 y_tree_5=y_tree_5+r_y*ymax
                  )%>%
           ungroup()%>%
           select(colnames(grid_df_day))
@@ -254,21 +273,52 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
     }
     
     
-    lims=as.numeric(reps%>%
-                      group_by(Design)%>%
-                      summarize(x=max(x,na.rm=T),
-                                y=max(y,na.rm=T))%>%
-                      ungroup()%>%
-                      summarize(x=min(x),y=min(y)))
+    # lims=as.numeric(reps%>%
+    #                   group_by(Design)%>%
+    #                   summarize(x=max(x,na.rm=T),
+    #                             y=max(y,na.rm=T))%>%
+    #                   ungroup()%>%
+    #                   summarize(x=min(x),y=min(y)))
     
-    min=min(c(lims,3*max(d_inter,d_intra)))
-    
+    # min=min(c(lims,3*max(d_inter,d_intra)))
+   
+    if (designType %in% c('quincunx','square','quincunx2','square2')){
     grid_fin=reps%>%
-      filter(x<=min & y<=min)%>%
-      filter(x_tree_1<=min & y_tree_1<=min)%>%
-      filter(x_tree_2<=min & y_tree_2<=min)%>%
+      filter(x<=lim & y<=lim)%>%
+      # filter(x_tree_1<=lim & y_tree_1<=lim)%>%
+      # filter(x_tree_2<=lim & y_tree_2<=lim)%>%
       mutate(Intercepted_rel=Intercepted/PARinc*100)
+    }
     
+    if (designType %in% c('quincunx3')){
+      grid_fin=reps%>%
+        filter(x<=lim & y<=lim)%>%
+        filter(x_tree_1<=lim & y_tree_1<=lim)%>%
+        filter(x_tree_2<=lim & y_tree_2<=lim)%>%
+        filter(x_tree_3<=lim & y_tree_3<=lim)%>%
+        mutate(Intercepted_rel=Intercepted/PARinc*100)
+    }
+    
+    if (designType %in% c('quincunx4')){
+      grid_fin=reps%>%
+        filter(x<=lim & y<=lim)%>%
+        filter(x_tree_1<=lim & y_tree_1<=lim)%>%
+        filter(x_tree_2<=lim & y_tree_2<=lim)%>%
+        filter(x_tree_3<=lim & y_tree_3<=lim)%>%
+        filter(x_tree_4<=lim & y_tree_4<=lim)%>%
+        mutate(Intercepted_rel=Intercepted/PARinc*100)
+    }
+    
+    if (designType %in% c('quincunx5')){
+      grid_fin=reps%>%
+        filter(x<=lim & y<=lim)%>%
+        filter(x_tree_1<=lim & y_tree_1<=lim)%>%
+        filter(x_tree_2<=lim & y_tree_2<=lim)%>%
+        filter(x_tree_3<=lim & y_tree_3<=lim)%>%
+        filter(x_tree_4<=lim & y_tree_4<=lim)%>%
+        filter(x_tree_5<=lim & y_tree_5<=lim)%>%
+        mutate(Intercepted_rel=Intercepted/PARinc*100)
+    }
     
     ### save the map
     data.table::fwrite(x = grid_fin,file =fileMap)
@@ -281,52 +331,159 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
   
   ### graphic
   grid= data.table::fread(paste0(path_designs,design_name,'.csv'))
-  density=round(nrow(grid)*10000/(unique(grid$xmax)*unique(grid$ymax)))
+  density=floor(nrow(grid)*10000/(unique(grid$xmax)*unique(grid$ymax)))
   
   if(orientation=='NS'){
-  plot=grid_fin%>%
-    mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
-    ggplot(aes(x=x, y=y,fill=Intercepted_rel,col=Intercepted_rel))+
-    geom_point(pch=22)+
-    geom_point(aes(x=x_tree_1,y=y_tree_1),pch=8,col='forestgreen',size=3)+
-    geom_point(aes(x=x_tree_2,y=y_tree_2),pch=8,col='forestgreen',size=3)+
-    # geom_point(aes(x=x_tree_3,y=y_tree_3),pch=8,col=2,size=2)+
-    # geom_point(aes(x=x_tree_4,y=y_tree_4),pch=8,col=2,size=2)+
-    # coord_fixed()+
-    ylim(low= 0, high= min(c(max(grid_fin$y),max(grid_fin$x))))+
-    xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-    # labs(x = 'x (m)', y = 'y (m)',fill= expression (MJ*' '*m**-2*' '*day**-1 ),col=expression (MJ*' '*m**-2*' '*day**-1 )) +
-    labs(x = 'Intra row distance (m)', y = 'Inter row distance (m)',fill= expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)')) +
-    scale_fill_viridis(option = 'plasma',limits = c(0, 100))+
-    scale_color_viridis(option = 'plasma',limits = c(0, 100))+
-    ggtitle(paste(design_name,' -',orientation),
-            paste(paramFileName,' density:',density,'palms ha-1'))+
-    coord_equal()+
-    myTheme
+    if (designType %in% c('quincunx','quincunx2','square','square2')){
+      plot=grid_fin%>%
+        mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
+        ggplot(aes(x=x, y=y,fill=Intercepted_rel))+
+        geom_tile()+
+        geom_point(aes(x=x_tree_1,y=y_tree_1),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_2,y=y_tree_2),pch=8,col='forestgreen',size=3)+
+        ylim(low= 0, high= lim)+
+        xlim(low= 0, high=lim)+
+        labs(y = 'Intra row distance (m)', x = 'Inter row distance (m)',fill= expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)')) +
+        ggtitle(paste(density,' plants.ha-1'))+
+        scale_fill_viridis(option = 'cividis',limits = c(0, 100))+
+        # scale_fill_gradient2(low = 'forestgreen',mid = '#addd8e',high = '#f7fcb9',limits=c(0,100))+
+        # scale_color_viridis(option = 'cividis',limits = c(0, 100))+
+        coord_equal()+
+        myTheme+
+        theme(legend.position = 'bottom')
+    }
+    if (designType %in% c('quincunx3')){
+      plot=grid_fin%>%
+        mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
+        ggplot(aes(x=x, y=y,fill=Intercepted_rel))+
+        geom_tile()+
+        geom_point(aes(x=x_tree_1,y=y_tree_1),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_2,y=y_tree_2),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_3,y=y_tree_3),pch=8,col='forestgreen',size=3)+
+        ylim(low= 0, high= lim)+
+        xlim(low= 0, high=lim)+
+        ggtitle(paste(density,' plants.ha-1'))+
+        labs(y = 'Intra row distance (m)', x = 'Inter row distance (m)',fill= expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)')) +
+        scale_fill_viridis(option = 'cividis',limits = c(0, 100))+
+        coord_equal()+
+        myTheme+
+        theme(legend.position = 'bottom')
+    }
+    if (designType %in% c('quincunx4')){
+      plot=grid_fin%>%
+        mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
+        ggplot(aes(x=x, y=y,fill=Intercepted_rel))+
+        geom_tile()+
+        geom_point(aes(x=x_tree_1,y=y_tree_1),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_2,y=y_tree_2),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_3,y=y_tree_3),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_4,y=y_tree_4),pch=8,col='forestgreen',size=3)+
+        ylim(low= 0, high= lim)+
+        xlim(low= 0, high=lim)+
+        ggtitle(paste(density,' plants.ha-1'))+
+        labs(y = 'Intra row distance (m)', x = 'Inter row distance (m)',fill= expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)')) +
+        scale_fill_viridis(option = 'cividis',limits = c(0, 100))+
+        coord_equal()+
+        myTheme+
+        theme(legend.position = 'bottom')
+    }
+    if (designType %in% c('quincunx5')){
+      plot=grid_fin%>%
+        mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
+        ggplot(aes(x=x, y=y,fill=Intercepted_rel))+
+        geom_tile()+
+        geom_point(aes(x=x_tree_1,y=y_tree_1),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_2,y=y_tree_2),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_3,y=y_tree_3),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_4,y=y_tree_4),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=x_tree_5,y=y_tree_5),pch=8,col='forestgreen',size=3)+
+        ylim(low= 0, high= lim)+
+        xlim(low= 0, high=lim)+
+        ggtitle(paste(density,' plants.ha-1'))+
+        labs(y = 'Intra row distance (m)', x = 'Inter row distance (m)',fill= expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)')) +
+        scale_fill_viridis(option = 'cividis',limits = c(0, 100))+
+        coord_equal()+
+        myTheme+
+        theme(legend.position = 'bottom')
+    }
   }
   
   if(orientation=='EW'){
+    if (designType %in% c('quincunx','quincunx2','square','square2')){
     plot=grid_fin%>%
       mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
-      ggplot(aes(x=y, y=x,fill=Intercepted_rel,col=Intercepted_rel))+
-      geom_point(pch=22)+
+      ggplot(aes(x=y, y=x,fill=Intercepted_rel))+
+      geom_tile()+
       geom_point(aes(x=y_tree_1,y=x_tree_1),pch=8,col='forestgreen',size=3)+
       geom_point(aes(x=y_tree_2,y=x_tree_2),pch=8,col='forestgreen',size=3)+
-      # geom_point(aes(x=x_tree_3,y=y_tree_3),pch=8,col=2,size=2)+
-      # geom_point(aes(x=x_tree_4,y=y_tree_4),pch=8,col=2,size=2)+
-      # coord_fixed()+
-      ylim(low= 0, high= min(c(max(grid_fin$y),max(grid_fin$x))))+
-      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-      # labs(x = 'x (m)', y = 'y (m)',fill= expression (MJ*' '*m**-2*' '*day**-1 ),col=expression (MJ*' '*m**-2*' '*day**-1 )) +
+      ylim(low= 0, high= lim)+
+      xlim(low= 0, high=lim)+
+      ggtitle(paste(density,' plants.ha-1'))+
       labs(x = 'Intra row distance (m)', y = 'Inter row distance (m)',fill= expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)')) +
-      scale_fill_viridis(option = 'plasma',limits = c(0, 100))+
-      scale_color_viridis(option = 'plasma',limits = c(0, 100))+
-      ggtitle(paste(design_name,' -',orientation),
-              paste(paramFileName,' density:',density,'palms ha-1'))+
+      scale_fill_viridis(option = 'cividis',limits = c(0, 100))+
       coord_equal()+
-      myTheme
+      myTheme+
+      theme(legend.position = 'bottom')
+    }
+    if (designType %in% c('quincunx3')){
+      plot=grid_fin%>%
+        mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
+        ggplot(aes(x=y, y=x,fill=Intercepted_rel))+
+        geom_tile()+
+        geom_point(aes(x=y_tree_1,y=x_tree_1),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=y_tree_2,y=x_tree_2),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=y_tree_3,y=x_tree_3),pch=8,col='forestgreen',size=3)+
+        ylim(low= 0, high= lim)+
+        xlim(low= 0, high=lim)+
+        ggtitle(paste(density,' plants.ha-1'))+
+        labs(x = 'Intra row distance (m)', y = 'Inter row distance (m)',fill= expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)')) +
+        scale_fill_viridis(option = 'cividis',limits = c(0, 100))+
+        coord_equal()+
+        myTheme+
+        theme(legend.position = 'bottom')
+    }
+    if (designType %in% c('quincunx4')){
+      plot=grid_fin%>%
+        mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
+        ggplot(aes(x=y, y=x,fill=Intercepted_rel))+
+        geom_tile()+
+        geom_point(aes(x=y_tree_1,y=x_tree_1),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=y_tree_2,y=x_tree_2),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=y_tree_3,y=x_tree_3),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=y_tree_4,y=x_tree_4),pch=8,col='forestgreen',size=3)+
+        ylim(low= 0, high= lim)+
+        xlim(low= 0, high=lim)+
+        ggtitle(paste(density,' plants.ha-1'))+
+        labs(x = 'Intra row distance (m)', y = 'Inter row distance (m)',fill= expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)')) +
+        scale_fill_viridis(option = 'cividis',limits = c(0, 100))+
+        coord_equal()+
+        myTheme+
+        theme(legend.position = 'bottom')
+    }
+    if (designType %in% c('quincunx5')){
+      plot=grid_fin%>%
+        mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
+        ggplot(aes(x=y, y=x,fill=Intercepted_rel))+
+        geom_tile()+
+        geom_point(aes(x=y_tree_1,y=x_tree_1),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=y_tree_2,y=x_tree_2),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=y_tree_3,y=x_tree_3),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=y_tree_4,y=x_tree_4),pch=8,col='forestgreen',size=3)+
+        geom_point(aes(x=y_tree_5,y=x_tree_5),pch=8,col='forestgreen',size=3)+
+        ylim(low= 0, high= lim)+
+        xlim(low= 0, high=lim)+
+        ggtitle(paste(density,' plants.ha-1'))+
+        labs(x = 'Intra row distance (m)', y = 'Inter row distance (m)',fill= expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)')) +
+        scale_fill_viridis(option = 'cividis',limits = c(0, 100))+
+        coord_equal()+
+        myTheme+
+        theme(legend.position = 'bottom')
+    }
+    
   }
   
+  
+  if (designType %in% c('quincunx','quincunx2','square','square2')){
   plot2=grid_fin%>%
     group_by(x)%>%
     summarize(Intercepted_rel=mean(Intercepted_rel),
@@ -335,14 +492,79 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
     ungroup()%>%
     ggplot(aes(x=x, y=Intercepted_rel,col=Intercepted_rel))+
     geom_line()+
-    geom_vline(aes(xintercept = x_tree_1),col='forestgreen')+
-    geom_vline(aes(xintercept = x_tree_2),col='forestgreen')+
-    scale_color_viridis(option = 'plasma',limits = c(0, 100))+
+    geom_vline(aes(xintercept = x_tree_1),col='forestgreen',lwd=1)+
+    geom_vline(aes(xintercept = x_tree_2),col='forestgreen',lwd=1)+
+    scale_color_viridis(option = 'cividis',limits = c(0, 100))+
     xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-    # ggtitle(paste("Inter row:",d_inter,'m','- Intra row:',d_intra,'m -',orientation),
-    #         paste('density:',density,'palms ha-1'))+
-  labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))
+    ylim(c(0,100))+
+    ggtitle(paste(density,' plants.ha-1'))+
+  labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))+
+    myTheme
+  }
   
+  if (designType %in% c('quincunx3')){
+    plot2=grid_fin%>%
+      group_by(x)%>%
+      summarize(Intercepted_rel=mean(Intercepted_rel),
+                x_tree_1=mean(x_tree_1),
+                x_tree_2=mean(x_tree_2),
+                x_tree_3=mean(x_tree_3))%>%
+      ungroup()%>%
+      ggplot(aes(x=x, y=Intercepted_rel,col=Intercepted_rel))+
+      geom_line()+
+      geom_vline(aes(xintercept = x_tree_1),col='forestgreen',lwd=1)+
+      geom_vline(aes(xintercept = x_tree_2),col='forestgreen',lwd=1)+
+      geom_vline(aes(xintercept = x_tree_3),col='forestgreen',lwd=1)+
+      scale_color_viridis(option = 'cividis',limits = c(0, 100))+
+      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
+      ylim(c(0,100))+
+      ggtitle(paste(density,' plants.ha-1'))+
+      labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))
+  }
+  if (designType %in% c('quincunx4')){
+    plot2=grid_fin%>%
+      group_by(x)%>%
+      summarize(Intercepted_rel=mean(Intercepted_rel),
+                x_tree_1=mean(x_tree_1),
+                x_tree_2=mean(x_tree_2),
+                x_tree_3=mean(x_tree_3),
+                x_tree_4=mean(x_tree_4))%>%
+      ungroup()%>%
+      ggplot(aes(x=x, y=Intercepted_rel,col=Intercepted_rel))+
+      geom_line()+
+      geom_vline(aes(xintercept = x_tree_1),col='forestgreen',lwd=1)+
+      geom_vline(aes(xintercept = x_tree_2),col='forestgreen',lwd=1)+
+      geom_vline(aes(xintercept = x_tree_3),col='forestgreen',lwd=1)+
+      geom_vline(aes(xintercept = x_tree_4),col='forestgreen',lwd=1)+
+      scale_color_viridis(option = 'cividis',limits = c(0, 100))+
+      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
+      ylim(c(0,100))+
+      ggtitle(paste(density,' plants.ha-1'))+
+      labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))
+  }
+  if (designType %in% c('quincunx5')){
+    plot2=grid_fin%>%
+      group_by(x)%>%
+      summarize(Intercepted_rel=mean(Intercepted_rel),
+                x_tree_1=mean(x_tree_1),
+                x_tree_2=mean(x_tree_2),
+                x_tree_3=mean(x_tree_3),
+                x_tree_4=mean(x_tree_4),
+                x_tree_5=mean(x_tree_5))%>%
+      ungroup()%>%
+      ggplot(aes(x=x, y=Intercepted_rel,col=Intercepted_rel))+
+      geom_line()+
+      geom_vline(aes(xintercept = x_tree_1),col='forestgreen',lwd=1)+
+      geom_vline(aes(xintercept = x_tree_2),col='forestgreen',lwd=1)+
+      geom_vline(aes(xintercept = x_tree_3),col='forestgreen',lwd=1)+
+      geom_vline(aes(xintercept = x_tree_4),col='forestgreen',lwd=1)+
+      geom_vline(aes(xintercept = x_tree_5),col='forestgreen',lwd=1)+
+      scale_color_viridis(option = 'cividis',limits = c(0, 100))+
+      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
+      ylim(c(0,100))+
+      ggtitle(paste(density,' plants.ha-1'))+
+      labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))
+  }
   
   im=readPNG("north.png")
   

@@ -10,7 +10,7 @@ lapply(packs, InstIfNec)
 source('1-code/helpers.R')
 
 ### generate Vpalm param
-MAP=36
+MAP=90
 e=5
 s=1
 

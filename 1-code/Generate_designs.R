@@ -36,15 +36,17 @@ myTheme=theme_minimal() %+replace%
 #' @param dist_intra distance within row of palm trees (m)
 #' @param dist_inter distance between rows of palm trees (m)
 #' @param dist_intercrop distance between multiple rows of palm trees (m), for intercropping 
-#' @param designType type of design (square,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
+#' @param designType type of design (square,square2,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
 #' @param orientation orientation of the scene ('NS': North-South or 'EW': East-West)
 #' @param pointSize size of point in the plot
-#'
+#' @param replanting allow to visualize old 9x9 quinconx positions on plots 
+#' @param lim limit of the area for plotting map (m)
+#' 
 #' @return
 #' @export
 #'
 #' @examples
-generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,pointSize=5){
+generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,pointSize=5,replanting=T,lim=50){
 
   # l=9.21
   # h=sqrt(3*l**2/4)
@@ -52,8 +54,9 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   # dist_intercrop=2*h
   # dist_inter=h
   # designType='square'
+  # pointSize=3
 
-  if (!designType %in% c('square','quincunx','quincunx2','quincunx3','quincunx4','quincunx5')){
+  if (!designType %in% c('square','square2','quincunx','quincunx2','quincunx3','quincunx4','quincunx5')){
     print('please select a designType among square quincunx quincunx2  quincunx3 quincunx4 quincunx5')
     return(NULL)
   }
@@ -61,7 +64,8 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   
   if (designType=='square'){
     if(!is.null(dist_intercrop)){
-      print('dist_intercrop is not considered in square design')}
+      print('dist_intercrop is not considered in square design')
+      return(NULL)}
     
     x1=dist_inter/2
     y1=dist_intra/2
@@ -75,8 +79,8 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   }
   
   if (designType=='quincunx'){
-    if(is.null(dist_intercrop)){
-      print('dist_intercrop is not considered in quinconx design')
+    if(!is.null(dist_intercrop)){
+      print('dist_intercrop is not considered in quincunx design')
       return(NULL)}
     
     x1=dist_inter/2
@@ -94,7 +98,7 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   
   if (designType=='quincunx2'){
     if(is.null(dist_intercrop)){
-      print('please provide dist_intercrop in quinconx2 design')
+      print('please provide dist_intercrop in quincunx2 design')
       return(NULL)}
     
     x1=dist_inter/2
@@ -110,10 +114,33 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
                                     ymin= 0, ymax= ymax)
     
   }
+  
+  if (designType=='square2'){
+    if(is.null(dist_intercrop)){
+      print('please provide dist_intercrop in square2 design')
+      return(NULL)}
+    
+    
+    x1=dist_inter/2
+    y1=dist_intra/2
+    
+    x2=x1+dist_intercrop
+    y2=y1
+    
+    xmax=x2+dist_inter/2
+    ymax=y2+dist_intra/2
+    
+    voronoi_plot= data.frame(x= c(x1,x2),
+                             y= c(y1,y2),
+                             xmin= 0,xmax=xmax,
+                             ymin= 0, ymax= ymax)
+    
+  }
+  
  
   if (designType=='quincunx3'){
     if(is.null(dist_intercrop)){
-      print('please provide dist_intercrop in quinconx3 design')
+      print('please provide dist_intercrop in quincunx3 design')
       return(NULL)}
     
     x1=dist_inter/2
@@ -135,7 +162,7 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   
   if (designType=='quincunx4'){
     if(is.null(dist_intercrop)){
-      print('please provide dist_intercrop in quinconx4 design')
+      print('please provide dist_intercrop in quincunx4 design')
       return(NULL)}
     
     x1=dist_inter/2
@@ -158,7 +185,7 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   
   if (designType=='quincunx5'){
     if(is.null(dist_intercrop)){
-      print('please provide dist_intercrop in quinconx5 design')
+      print('please provide dist_intercrop in quincunx5 design')
       return(NULL)}
     
 
@@ -186,8 +213,8 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   if (designType %in% c('square','quincunx')){
     dist_intercrop=0}
       # number of raow and columns in 1 ha
-    repRows=ceiling(100/(dist_inter+dist_intercrop))
-    repCol=ceiling(100/dist_intra)
+    repRows=ceiling(lim/(dist_inter+dist_intercrop))
+    repCol=ceiling(lim/dist_intra)
     
   # number of raow and columns in 1 ha
   
@@ -217,33 +244,77 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   # plot:
   
 
-
+  if(orientation=='NS'){
   plot_bounds=
     design%>%
     ggplot2::ggplot(ggplot2::aes(x= x, y= y))+
     ggplot2::geom_point(shape=8,col='forestgreen',size=pointSize)+
     ylab('Intra row distance (m)')+
     xlab('Inter row distance (m)')+
-    xlim(c(0,100))+
-    ylim(c(0,100))+
+    xlim(c(0,lim))+
+    ylim(c(0,lim))+
     ggtitle(paste(density,' plants.ha-1'))+
     coord_equal()+
     myTheme
-  
+  }
   if(orientation=='EW'){
     plot_bounds=design%>%
       ggplot2::ggplot(ggplot2::aes(x= y, y= x))+
       ggplot2::geom_point(shape=8,col='forestgreen',size=pointSize)+
       xlab('Intra row distance (m)')+
       ylab('Inter row distance (m)')+
-      xlim(c(0,100))+
-      ylim(c(0,100))+
+      xlim(c(0,lim))+
+      ylim(c(0,lim))+
       ggtitle(paste(density,' plants.ha-1'))+
       coord_equal()+
       myTheme
       
       
   }
+  
+  if (replanting==T){
+    
+    oldDesign=data.table::fread(file = '0-data/oldDeisgn9x9.csv') %>% 
+      data.frame()%>%
+      mutate(x=x-dist_inter/2,
+             y=y-dist_intra/2)
+    
+    if(orientation=='NS'){
+    plot_bounds=ggplot()+
+      geom_point(data=oldDesign,aes(x= x, y= y,col='old planting',shape='old planting'),size=pointSize/2)+
+      geom_point(data=design,aes(x= x, y= y,col='replanting',shape='replanting'),size=pointSize)+
+      ylab('Intra row distance (m)')+
+      xlab('Inter row distance (m)')+
+      xlim(c(0,lim))+
+      ylim(c(0,lim))+
+      ggtitle(paste(density,' plants.ha-1'))+
+      coord_equal()+
+      myTheme+
+      scale_color_manual(values = c('old planting'='lightgrey',replanting='forestgreen'),name='')+
+      scale_shape_manual(values = c('old planting'=1,'replanting'=8),name='')+
+      theme(legend.position='bottom')
+    }
+    if(orientation=='EW'){
+      plot_bounds=ggplot()+
+        geom_point(data=oldDesign,aes(x= y, y= x,col='old planting',shape='old planting'),size=pointSize/2)+
+        geom_point(data=design,aes(x= y, y= x,col='replanting',shape='replanting'),size=pointSize)+
+        xlab('Intra row distance (m)')+
+        ylab('Inter row distance (m)')+
+        xlim(c(0,lim))+
+        ylim(c(0,lim))+
+        ggtitle(paste(density,' plants.ha-1'))+
+        coord_equal()+
+        myTheme+
+        scale_color_manual(values = c('old planting'='lightgrey',replanting='forestgreen'),name='')+
+        scale_shape_manual(values = c('old planting'=1,'replanting'=8),name='')+
+        theme(legend.position='bottom')
+      
+      
+    }
+    
+  }
+  
+
   
   im=readPNG("north.png")
   
@@ -263,101 +334,20 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
 }
 
 
-# generate_design(dist_intra = 5,dist_intercrop = 0,dist_inter = 15,designType = 'square',orientation = 'EW')
-# generate_design(dist_intra = 5,dist_intercrop = 0,dist_inter = 15,designType = 'square',orientation = 'NS')
-# 
-# generate_design(dist_intra = 9,dist_intercrop = 12,dist_inter = 5,designType = 'quincunx2',orientation = 'NS')
-# generate_design(dist_intra = 9,dist_intercrop = 12,dist_inter = 5,designType = 'quincunx3',orientation = 'EW')
 
-# inputs ------------------------------------------------------------------
-
-##### quincunx designs
-
-
-
-##### design 1/3--> double rangée
-# 
-# 
+### save the conventional design for visualizing old palms in replanting 
+# l=9
+# h=sqrt(3*l**2/4)
 # dist_intra=l
-# dist_intercrop=2*h
+# dist_intercrop=NULL
 # dist_inter=h
 # 
-# x1=dist_inter/2
-# y1=dist_intra/4
-# x2=dist_inter/2+dist_intercrop
-# y2=dist_intra/4+dist_intra/2
-# xmax=dist_inter+dist_intercrop
-# ymax=dist_intra
-# 
-# voronoi_plot_double= data.frame(x= c(x1,x2),
-#                          y= c(y1,y2),
-#                          xmin= 0,xmax=xmax,
-#                          ymin= 0, ymax= ymax)
-# 
-# 
-# generate_design(voronoi_plot =voronoi_plot_double )
-# 
-# 
-# ### design 1/4--> triple rangée
-# 
-# 
-# x1=dist_inter/2
-# y1=dist_intra/4
-# x2=x1+dist_inter
-# y2=y1+dist_intra/2
-# x3=x2+dist_intercrop
-# y3=y2
-# xmax=x3+dist_inter/2
-# ymax=y3+dist_intra/4
-# 
-# voronoi_plot_triple= data.frame(x= c(x1,x2,x3),
-#                            y= c(y1,y2,y3),
-#                            xmin= 0, xmax= xmax,
-#                            ymin= 0, ymax= ymax)
-# 
-# 
-# generate_design(voronoi_plot =voronoi_plot_triple )
-# 
-# ##### design 2/6 ou 1/5--> quadruple rangées
-# 
-# dist_intercrop=14
-# 
-# x1=dist_inter/2
-# y1=dist_intra/4
-# x2=x1+dist_inter
-# y2=y1+dist_intra/2
-# x3=x2+dist_intercrop
-# y3=y1
-# x4=x3+dist_inter
-# y4=y2
-# xmax=x4+dist_inter/2
-# ymax=y4+dist_intra/4
-# 
-# voronoi_plot_quadruple= data.frame(x= c(x1,x2,x3,x4),
-#                            y= c(y1,y2,y3,y4),
-#                            xmin= 0, xmax= xmax,
-#                            ymin= 0, ymax= ymax)
-# 
-# generate_design(voronoi_plot =voronoi_plot_quadruple )
-# 
-#   
-# ##### design 1/6 --> quintuple rangées
-# x1=dist_inter/2
-# y1=dist_intra/4
-# x2=x1+dist_inter
-# y2=y1+dist_intra/2
-# x3=x2+dist_intercrop
-# y3=y2
-# x4=x3+dist_inter/2
-# y4=y1
-# x5=x4+dist_inter
-# y5=y3
-# xmax=x5+dist_inter/2
-# ymax=y5+dist_intra/4
-# 
-# voronoi_plot_quintuple= data.frame(x= c(x1,x2,x3,x4,x5),
-#                                    y= c(y1,y2,y3,y4,y5),
-#                                    xmin= 0, xmax= xmax,
-#                                    ymin= 0, ymax= ymax)
-# 
-# generate_design(voronoi_plot =voronoi_plot_quintuple )
+# oldDesign=generate_design(dist_intra = dist_intra,dist_intercrop = NULL,dist_inter = h,designType = 'quincunx',orientation = 'NS')$design
+
+### save
+
+# fwrite(x =oldDesign,file = '0-data/oldDeisgn9x9.csv')
+  
+
+
+
