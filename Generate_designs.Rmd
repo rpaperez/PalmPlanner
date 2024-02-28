@@ -52,10 +52,13 @@ designType='quincunx'
 a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = 'NS',pointSize = 3)$plot
 m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 plot_grid(a1,a2,ncol=2)
-plot_grid(m1$plot,m1$plot,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
+
 ```
 
 ### Intra-row = 11m & Inter-row = 9.5m. (T 11m x 11m)
@@ -66,13 +69,18 @@ Here is another example of quincunx design with a 11 x 11 m. The paramteres are 
 ##### Simple quincunx design
 l=11
 h=round(sqrt(3*(l**2)/4),1)
+designType='quincunx'
 
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "NS",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
+
 
 plot_grid(a1,a2,ncol=2)
-
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 ```
 
 
@@ -84,14 +92,17 @@ A quincunx design 18 x 18 m reduced sharply the density to 35 palms per hectare
 
 l=18
 h=round(sqrt(3*(l**2)/4),1)
-
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "NS",pointSize = 3)$plot
+designType='quincunx'
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "NS",pointSize = 3)$plot
 m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'quincunx',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
+
 
 plot_grid(a1,a2,ncol=2)
-plot_grid(m1$plot,m1$plot,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 ```
 
 
@@ -105,12 +116,18 @@ The following designs are squared layout with the different distances proposed b
 
 l=9
 h=8
+designType='square'
 
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'square',orientation = "NS",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'square',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
+
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -121,12 +138,18 @@ plot_grid(a1,a2,ncol=2)
 
 l=9
 h=9
+designType='square'
 
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'square',orientation = "NS",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'square',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
+
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -138,11 +161,17 @@ plot_grid(a1,a2,ncol=2)
 l=9
 h=11
 
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'square',orientation = "NS",pointSize = 3)$plot
+designType='square'
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'square',orientation = "EW",pointSize = 3)$plot
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
+
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -153,11 +182,18 @@ plot_grid(a1,a2,ncol=2)
 l=12
 h=12
 
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'square',orientation = "NS",pointSize = 3)$plot
+designType='square'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = 'square',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = NULL,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = NULL,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
+
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -172,15 +208,21 @@ This design is the 9 x 9 m quincunx layout with one row out of three removed.
 ```{r twin1, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
 i=2*h
   
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
+designType='quincunx2'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -191,13 +233,19 @@ plot_grid(a1,a2,ncol=2)
 l=9
 h=6.8
 i=16.6
-  
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+designType='quincunx2'
+
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -209,12 +257,18 @@ l=9
 h=6
 i=17.4
   
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
+designType='quincunx2'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -224,15 +278,20 @@ plot_grid(a1,a2,ncol=2)
 ```{r twin4, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=8
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
 i=16.5
-  
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
+designType='quincunx2'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -245,15 +304,21 @@ The intercorpping distance can be adapted to increase oil palm density. Not pros
 ```{r twin5, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
 i=12
-  
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "NS",pointSize = 3)$plot
+ 
+designType='quincunx2'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx2',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -265,15 +330,22 @@ With a 12m intercropping distance, a twin-row design with a square layout can be
 ```{r twin6, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
 i=12
-  
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'square2',orientation = "NS",pointSize = 3)$plot
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'square2',orientation = "EW",pointSize = 3)$plot
+designType='square2'
+
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
+
 
 ```
 
@@ -286,12 +358,19 @@ l=12
 h=9
 i=12
   
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'square2',orientation = "NS",pointSize = 3)$plot
+designType='square2'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'square2',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
+
 
 ```
 
@@ -304,15 +383,21 @@ This design is the 9 x 9 m quincunx layout with one row out of four removed.
 ```{r triple1, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
 i=2*h
   
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx3',orientation = "NS",pointSize = 3)$plot
+designType='quincunx3'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx3',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -326,12 +411,18 @@ l=9
 h=6.8
 i=17.6
   
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx3',orientation = "NS",pointSize = 3)$plot
+designType='quincunx3'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx3',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
@@ -344,15 +435,22 @@ This design is the 9 x 9 m quincunx layout with one row out of five removed.
 ```{r quadruple1, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
 i=2*h
   
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx4',orientation = "NS",pointSize = 3)$plot
+designType='quincunx4'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx4',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
+
 
 ```
 
@@ -364,18 +462,24 @@ plot_grid(a1,a2,ncol=2)
 
 This design is the 9 x 9 m quincunx layout with one row out of six removed.
 
-```{r quintuple1, echo=FALSE,warning=FALSE,}
+```{r quintuple1, echo=FALSE,warning=FALSE,message=FALSE,results='hide'}
 
 l=9
-h=sqrt(3*(l**2)/4)
+h=round(sqrt(3*(l**2)/4),1)
 i=2*h
   
-a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx5',orientation = "NS",pointSize = 3)$plot
+designType='quincunx5'
 
-a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop =i ,designType = 'quincunx5',orientation = "EW",pointSize = 3)$plot
+a1=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "NS",pointSize = 3)$plot
+m1=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="NS" )
+
+a2=generate_design(dist_intra = l,dist_inter = h,dist_intercrop = i,designType = designType,orientation = "EW",pointSize = 3)$plot
+m2=Create_map(designType =designType ,d_inter =h,d_intra = l,d_intercrop = i,path_designs =path_designs,paramFileName =  paramFileName,orientation ="EW" )
 
 
 plot_grid(a1,a2,ncol=2)
+plot_grid(m1$plot,m2$plot,ncol=2)
+plot_grid(m1$plot2,m2$plot2,ncol=2)
 
 ```
 
