@@ -41,12 +41,13 @@ myTheme=theme_minimal() %+replace%
 #' @param pointSize size of point in the plot
 #' @param replanting allow to visualize old 9x9 quinconx positions on plots 
 #' @param lim limit of the area for plotting map (m)
+#' @param twist twist/rotation of the palm stem in the ops file (in degree)
 #' 
 #' @return
 #' @export
 #'
 #' @examples
-generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,pointSize=5,replanting=T,lim=50){
+generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,twist=twist,pointSize=5,replanting=T,lim=50){
 
   # l=9.21
   # h=sqrt(3*l**2/4)
@@ -56,7 +57,7 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   # designType='square'
   # pointSize=3
 
-  if (!designType %in% c('square','square2','quincunx','quincunx2','quincunx3','quincunx4','quincunx5')){
+  if (!designType %in% c('square','square_bis','quincunx_bis','square2','quincunx','quincunx2','quincunx3','quincunx4','quincunx5')){
     print('please select a designType among square quincunx quincunx2  quincunx3 quincunx4 quincunx5')
     return(NULL)
   }
@@ -76,6 +77,25 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
                             y= y1,
                             xmin= 0,xmax=xmax,
                             ymin= 0, ymax= ymax)
+    
+  }
+  
+  ### test for estimating differences du to rotation in Archimed 
+  if (designType %in% c('square_bis')){
+    if(!is.null(dist_intercrop)){
+      print('dist_intercrop is not considered in square design')
+      return(NULL)}
+    
+    x1=dist_inter/2
+    y1=dist_intra/2
+    xmax=x1+dist_inter/2
+    ymax=y1+dist_intra/2
+    
+    voronoi_plot=data.frame(x= y1,
+                            y= x1,
+                            xmin= 0,xmax=ymax,
+                            ymin= 0, ymax= xmax)
+    
   }
   
   if (designType=='quincunx'){
@@ -94,6 +114,24 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
                            y= c(y1,y2),
                            xmin= 0,xmax=xmax,
                            ymin= 0, ymax= ymax)
+  }
+  
+  if (designType=='quincunx_bis'){
+    if(!is.null(dist_intercrop)){
+      print('dist_intercrop is not considered in quincunx design')
+      return(NULL)}
+    
+    x1=dist_inter/2
+    y1=dist_intra/4
+    x2=dist_inter/2+dist_inter
+    y2=dist_intra/4+dist_intra/2
+    xmax=x2+dist_inter/2
+    ymax=y2+dist_intra/4
+    
+    voronoi_plot=data.frame(x= c(y1,y2),
+                            y= c(x1,x2),
+                            xmin= 0,xmax=ymax,
+                            ymin= 0, ymax= xmax)
   }
   
   if (designType=='quincunx2'){
@@ -210,7 +248,7 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
   }
   
   
-  if (designType %in% c('square','quincunx')){
+  if (designType %in% c('square','square_bis','quincunx_bis','quincunx')){
     dist_intercrop=0}
       # number of raow and columns in 1 ha
     repRows=ceiling(lim/(dist_inter+dist_intercrop))
@@ -323,11 +361,21 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
     draw_image(im,x = 0.4,y = 0.4,scale=0.1)
   
   # result to export scene pattern
-  result=
-    voronoi_plot%>%
-    dplyr::mutate(z= 0.0, scale= 1.0,
-                  inclinationAzimut= 0.0, inclinationAngle= 0.0,
-                  stemTwist= 0.0)
+  if (orientation=='NS'){
+    result=
+      voronoi_plot%>%
+      dplyr::mutate(z= 0.0, scale= 1.0,
+                    inclinationAzimut= 0.0, inclinationAngle= 0.0,
+                    stemTwist= twist)
+  }
+ 
+  if (orientation=='EW'){
+    result=
+      voronoi_plot%>%
+      dplyr::mutate(z= 0.0, scale= 1.0,
+                    inclinationAzimut= 0.0, inclinationAngle= 0.0,
+                    stemTwist= twist)
+  }
   
   list(design=design,result= result, plot= visu,density=density)
   

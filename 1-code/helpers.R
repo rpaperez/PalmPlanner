@@ -634,11 +634,13 @@ design=function(dist_inter= NULL, dist_intra= NULL){
 #' @param dist_inter distance between rows of palm trees (m)
 #' @param dist_intercrop distance between multiple rows of palm trees (m), for intercropping 
 #' @param designType type of design (square,square2,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
+#' @param twist twist/rotation of the palm stem in the ops file (in degree)
+#'
 #' @return ops file
 #' @export
 #'
 #' @examples
-create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,writeOPS=T,pathOPS=NULL){
+create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,twist=twist,writeOPS=T,pathOPS=NULL){
   
   # opfname='opfname'
   # dist_inter=12
@@ -649,7 +651,7 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
   
   ### generate the design
   
-  des=generate_design(dist_inter =dist_inter, dist_intra=dist_intra,dist_intercrop =dist_intercrop,designType = designType,orientation = orientation,pointSize = 3)$result
+  des=generate_design(dist_inter =dist_inter, dist_intra=dist_intra,dist_intercrop =dist_intercrop,designType = designType,orientation = orientation,twist=twist,pointSize = 3)$result
   
   
   xmin=unique(des$xmin)
@@ -732,12 +734,12 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
   }
   if (writeOPS==T){
     
-    if (designType %in% c('square','quincunx')){
-      write(ops.file,file= paste0(pathOPS,'/',designType,'_inter',dist_inter,'_intra',dist_intra,'_',opfname,'.ops')) 
+    if (designType %in% c('square','square_bis','quincunx','quincunx_bis')){
+      write(ops.file,file= paste0(pathOPS,'/',designType,'_inter',dist_inter,'_intra',dist_intra,'_twist',twist,'_',opfname,'.ops')) 
       
     }
-    if (!(designType %in% c('square','quincunx'))){
-     write(ops.file,file= paste0(pathOPS,'/',designType,'_inter',dist_inter,'_intra',dist_intra,'_intercrop',dist_intercrop,'_',opfname,'.ops')) ###wrtie the ops
+    if (!(designType %in% c('square','square_bis','quincunx','quincunx_bis'))){
+     write(ops.file,file= paste0(pathOPS,'/',designType,'_inter',dist_inter,'_intra',dist_intra,'_intercrop',dist_intercrop,'_twist',twist,'_',opfname,'.ops')) ###wrtie the ops
     }
     
   }
@@ -848,12 +850,16 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
 #' @param opfStepExport step of simulation when the opf is exported (numeric 0-28)
 #' @param overwrite overwrite existing simulation
 #' @param orientation orientation of the scene (NS: North-South or EW: East-West)
+#' @param twist twist/rotation of the palm stem in the ops file (in degree)
+#'@param meteoFile meteoFIle for running simulations
+#'#'@param paramFileName paramFileName
+#'
 #'
 #' @return
 #' @export
 #'
 #' @examples
-RunSimu=function(MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop,designType=designType,pathVpalmParam=pathVpalmParam,pathArchimed=pathArchimed,path_designs=path_designs,pathVpalmJar=pathVpalmJar,pathOpf=pathOpf,pathOPS=pathOPS,run_photosynthesis=T,opfStepExport=14,overwrite=F,orientation='NS'){
+RunSimu=function(paramFileName=paramFileName,MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop,designType=designType,pathVpalmParam=pathVpalmParam,pathArchimed=pathArchimed,path_designs=path_designs,pathVpalmJar=pathVpalmJar,pathOpf=pathOpf,pathOPS=pathOPS,run_photosynthesis=T,opfStepExport=14,overwrite=F,orientation='NS',twist=twist,meteoFile='meteoCampecheFormated.csv'){
   
   # paramFileName='Mockup_seed1_MAP_180'
   # d_inter=8
@@ -871,14 +877,14 @@ RunSimu=function(MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop
   # run_photosynthesis=F
   # overwrite=T
   
-  paramFileName=paste0('DA1_Average_MAP_',MAP)
+  # paramFileName=paste0('DA1_Average_MAP_',MAP)
   
-  if (designType %in% c('square','quincunx')){
-    design_name=paste0(designType,'_inter',d_inter,'_intra',d_intra)
+  if (designType %in% c('square','square_bis','quincunx','quincunx_bis')){
+    design_name=paste0(designType,'_inter',d_inter,'_intra',d_intra,'_twist',twist)
     
   }
-  if (!(designType %in% c('square','quincunx'))){
-    design_name=paste0(designType,'_inter',d_inter,'_intra',d_intra,'_intercrop',d_intercrop)
+  if (!(designType %in% c('square','square_bis','quincunx','quincunx_bis'))){
+    design_name=paste0(designType,'_inter',d_inter,'_intra',d_intra,'_intercrop',d_intercrop,'_twist',twist)
   }
   
   folders=list.dirs(path ='./2-outputs/Run_simu/output',full.names = T)
@@ -914,11 +920,11 @@ RunSimu=function(MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop
       
     # generate ops ------------------------------------------------------------
     print('writting ops')
-    create.ops(opfname =paramFileName ,dist_inter = d_inter,dist_intra = d_intra,designType = designType,dist_intercrop =d_intercrop,orientation =orientation,  writeOPS = T,pathOPS = pathOPS)
+    create.ops(opfname =paramFileName ,dist_inter = d_inter,dist_intra = d_intra,designType = designType,dist_intercrop =d_intercrop,orientation =orientation,twist=twist,  writeOPS = T,pathOPS = pathOPS)
     
     ## save planting design
     print('saving planting design')
-    p_design=generate_design(dist_inter =d_inter, dist_intra=d_intra,dist_intercrop =d_intercrop,designType = designType ,orientation = orientation,pointSize = 3)$result
+    p_design=generate_design(dist_inter =d_inter, dist_intra=d_intra,dist_intercrop =d_intercrop,designType = designType ,orientation = orientation,twist=twist,pointSize = 3)$result
     
     data.table::fwrite(x=p_design,file = paste0(path_designs,design_name,'.csv'))
     
@@ -927,9 +933,10 @@ RunSimu=function(MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop
     ##"load template
     
     configYml=read_yaml(file =  '0-data/Archimed_inputs/config_template.yml')
+    meteo=data.table::fread(paste0('2-outputs/Run_simu/',meteoFile),skip=4,header=T)
     
-    configYml$meteo='meteoCampecheFormated.csv'
-    configYml$meteo_range='1, 12'
+    configYml$meteo=meteoFile
+    configYml$meteo_range=paste0('1, ',nrow(meteo))
     configYml$export_ops=6
     
     ## change names & dirs

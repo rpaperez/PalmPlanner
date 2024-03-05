@@ -33,6 +33,10 @@ replanting=T
 paramFileName=paste0('DA1_Average_MAP_',MAP)
 
 
+### test archimed rotation
+
+generate_design(dist_intra = 9,dist_inter = 9,dist_intercrop =NULL ,designType ='square_bis' ,orientation = 'NS',pointSize = 3,replanting = T)$plot
+
 ### check design
 # generate_design(dist_intra = dist_intra,dist_inter = dist_inter,dist_intercrop =dist_intercrop ,designType =designType ,orientation = orientation,pointSize = 3,replanting = T)$plot
 
@@ -71,6 +75,8 @@ for (orientation in c('NS','EW')){
     RunSimu(d_inter=dist_inter,d_intra=dist_intra,d_intercrop =dist_intercrop,designType =designType,  MAP=MAP,pathVpalmParam=pathVpalmParam,pathArchimed=pathArchimed,path_designs=path_designs,pathVpalmJar=pathVpalmJar,pathOpf=pathOpf,pathOPS=pathOPS,run_photosynthesis=T,opfStepExport=opfStepExport,overwrite =F,orientation=orientation)
   }
 }
+
+
 
 ## quincunx2
 designType='quincunx2'
