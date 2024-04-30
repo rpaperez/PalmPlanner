@@ -10,11 +10,11 @@ lapply(packs, InstIfNec)
 source('1-code/helpers.R')
 
 ### generate Vpalm param
-MAP=90
-e=5
-s=1
+MAP=10
+e=3000
+s=100
 
-Generate_Vpalm_param(MAP_requested =MAP,elastic_modulus =e,shear_modulus =s ,filename =paste(e,s,sep = '_') )
+Generate_Vpalm_param(MAP_requested =MAP,elastic_modulus =e,shear_modulus =s,nbLeaves = 3,filename =paste(e,s,sep = '_') )
 
 ###generate
 

@@ -18,14 +18,14 @@ lapply(packs, InstIfNec)
 source('1-code/helpers.R')
 source('1-code/VegetativeGrowth.R')
 
-Generate_Vpalm_param=function(MAP_requested=MAP_requested,elastic_modulus=3026,shear_modulus=125){
+Generate_Vpalm_param=function(MAP_requested=MAP_requested,elastic_modulus=3026,shear_modulus=125,nbLeaves=45){
 
   list_param=readRDS('0-data/vpalm_template.rds')
   
   ###inputs
   coefPhylo=2.16
   nbLeafEmitted=round(MAP_requested*coefPhylo)
-  nbLeaves=45
+  nbLeaves=nbLeaves
   
   # elastic_modulus=3026
   # shear_modulus =125
@@ -107,7 +107,5 @@ Generate_Vpalm_param=function(MAP_requested=MAP_requested,elastic_modulus=3026,s
   
 }
 
-
-Generate_Vpalm_param(MAP_requested = 180)
 
 

@@ -9,7 +9,7 @@ using ColorSchemes
 # Page(exportable=true, offline=true)
 
 GLMakie.activate!()
-mtg = read_opf("opf/5_1_MAP_36.opf")
+mtg = read_opf("opf/oriented_structure.opf")
 viz(mtg)
 
 ## 15/03

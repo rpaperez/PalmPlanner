@@ -216,14 +216,14 @@ new_format_tree=function (data)
 source('1-code/VegetativeGrowth.R')
 
 
-Generate_Vpalm_param=function(MAP_requested=MAP_requested,elastic_modulus=elastic_modulus,shear_modulus=shear_modulus,filename=filename){
+Generate_Vpalm_param=function(MAP_requested=MAP_requested,elastic_modulus=elastic_modulus,shear_modulus=shear_modulus,filename=filename,nbLeaves=45){
   
   list_param=readRDS('0-data/vpalm_template.rds')
   
   ###inputs
   coefPhylo=2.16
   nbLeafEmitted=round(MAP_requested*coefPhylo)
-  nbLeaves=45
+  nbLeaves=nbLeaves
   
   # elastic_modulus=3026
   # shear_modulus =125
@@ -635,12 +635,12 @@ design=function(dist_inter= NULL, dist_intra= NULL){
 #' @param dist_intercrop distance between multiple rows of palm trees (m), for intercropping 
 #' @param designType type of design (square,square2,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
 #' @param twist twist/rotation of the palm stem in the ops file (in degree)
-#'
+#' @param plant_model model input for archimed
 #' @return ops file
 #' @export
 #'
 #' @examples
-create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,twist=twist,writeOPS=T,pathOPS=NULL){
+create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,twist=twist,writeOPS=T,pathOPS=NULL,plant_model='elaeis'){
   
   # opfname='opfname'
   # dist_inter=12
@@ -673,7 +673,7 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
     ops.file=c(
       paste('# T xmin ymin zmin xmax ymax flat'),
       paste('T', xmin, ymin, zmin, xmax,ymax,'flat'),
-      paste('#[Archimed] elaeis'),
+      paste('#[Archimed]',plant_model),
       paste('#sceneId objectId FilePath x y z scale inclinationAzimut inclinationAngle rotation'),
       paste(table[1,],collapse=' ')
     )
@@ -683,7 +683,7 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
     ops.file=c(
       paste('# T xmin ymin zmin xmax ymax flat'),
       paste('T', xmin, ymin, zmin, xmax,ymax,'flat'),
-      paste('#[Archimed] elaeis'),
+      paste('#[Archimed]',plant_model),
       paste('#sceneId objectId FilePath x y z scale inclinationAzimut inclinationAngle rotation'),
       paste(table[1,]),
       paste(table[2,],collapse=' ')
@@ -694,7 +694,7 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
     ops.file=c(
       paste('# T xmin ymin zmin xmax ymax flat'),
       paste('T', xmin, ymin, zmin, xmax,ymax,'flat'),
-      paste('#[Archimed] elaeis'),
+      paste('#[Archimed]',plant_model),
       paste('#sceneId objectId FilePath x y z scale inclinationAzimut inclinationAngle rotation'),
       paste(table[1,]),
       paste(table[2,],collapse=' '),
@@ -705,7 +705,7 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
     ops.file=c(
       paste('# T xOrigin yOrigin zOrigin xSize ySize flat'),
       paste('T', xmin, ymin, zmin, xmax,ymax,'flat'),
-      paste('#[Archimed] elaeis'),
+      paste('#[Archimed]',plant_model),
       paste('#sceneId plantId plantFileName x y z scale inclinationAzimut inclinationAngle stemTwist'),
       paste(table[1,]),
       paste(table[2,],collapse=' '),
@@ -718,7 +718,7 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
     ops.file=c(
       paste('# T xOrigin yOrigin zOrigin xSize ySize flat'),
       paste('T', xmin, ymin, zmin, xmax,ymax,'flat'),
-      paste('#[Archimed] elaeis'),
+      paste('#[Archimed]',plant_model),
       paste('#sceneId plantId plantFileName x y z scale inclinationAzimut inclinationAngle stemTwist'),
       paste(table[1,]),
       paste(table[2,],collapse=' '),
@@ -853,13 +853,14 @@ create.ops=function(opfname='opfname',dist_inter= NULL, dist_intra= NULL,dist_in
 #' @param twist twist/rotation of the palm stem in the ops file (in degree)
 #'@param meteoFile meteoFIle for running simulations
 #'#'@param paramFileName paramFileName
+#'@param plant_model model input for archimed
 #'
 #'
 #' @return
 #' @export
 #'
 #' @examples
-RunSimu=function(paramFileName=paramFileName,MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop,designType=designType,pathVpalmParam=pathVpalmParam,pathArchimed=pathArchimed,path_designs=path_designs,pathVpalmJar=pathVpalmJar,pathOpf=pathOpf,pathOPS=pathOPS,run_photosynthesis=T,opfStepExport=14,overwrite=F,orientation='NS',twist=twist,meteoFile='meteoCampecheFormated.csv'){
+RunSimu=function(paramFileName=paramFileName,MAP=MAP,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop,designType=designType,pathVpalmParam=pathVpalmParam,pathArchimed=pathArchimed,path_designs=path_designs,pathVpalmJar=pathVpalmJar,pathOpf=pathOpf,pathOPS=pathOPS,run_photosynthesis=T,opfStepExport=14,overwrite=F,orientation='NS',twist=twist,meteoFile='meteoCampecheFormated.csv',plant_model='plant_elaeis'){
   
   # paramFileName='Mockup_seed1_MAP_180'
   # d_inter=8
@@ -895,7 +896,7 @@ RunSimu=function(paramFileName=paramFileName,MAP=MAP,d_inter=d_inter,d_intra=d_i
     print(paste(foldSim,'already exists, if you want to overwrite change overwrite argument in the RunSimu function'))
   }
   
-  if (!(foldSim %in% folders)){
+  if (!(foldSim %in% folders)| overwrite==T){
     
     print(paste("Running simulation:",foldSim))
     
@@ -920,7 +921,7 @@ RunSimu=function(paramFileName=paramFileName,MAP=MAP,d_inter=d_inter,d_intra=d_i
       
     # generate ops ------------------------------------------------------------
     print('writting ops')
-    create.ops(opfname =paramFileName ,dist_inter = d_inter,dist_intra = d_intra,designType = designType,dist_intercrop =d_intercrop,orientation =orientation,twist=twist,  writeOPS = T,pathOPS = pathOPS)
+    create.ops(opfname =paramFileName ,dist_inter = d_inter,dist_intra = d_intra,designType = designType,dist_intercrop =d_intercrop,orientation =orientation,twist=twist,  writeOPS = T,pathOPS = pathOPS,plant_model=plant_model)
     
     ## save planting design
     print('saving planting design')
@@ -934,7 +935,7 @@ RunSimu=function(paramFileName=paramFileName,MAP=MAP,d_inter=d_inter,d_intra=d_i
     
     configYml=read_yaml(file =  '0-data/Archimed_inputs/config_template.yml')
     meteo=data.table::fread(paste0('2-outputs/Run_simu/',meteoFile),skip=4,header=T)
-    
+    configYml$models[1]=paste0('models/',plant_model,'.yml')
     configYml$meteo=meteoFile
     configYml$meteo_range=paste0('1, ',nrow(meteo))
     configYml$export_ops=6
