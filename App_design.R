@@ -209,7 +209,7 @@ server<-function(input, output,session){
           xlim(c(0,lim))+
           ylim(c(0,lim))+
           labs(col=NULL)+
-          ggtitle(paste(design$density,' plants.ha-1'))+
+          ggtitle(paste(design$density,' palms.ha-1'))+
           coord_equal()+
           myTheme
      
@@ -242,7 +242,7 @@ server<-function(input, output,session){
           xlim(c(0,lim))+
           ylim(c(0,lim))+
           labs(col=NULL)+
-          ggtitle(paste(design$density,' plants.ha-1'))+
+          ggtitle(paste(design$density,' palms.ha-1'))+
           coord_equal()+
           myTheme
         
@@ -272,7 +272,7 @@ server<-function(input, output,session){
           xlim(c(0,lim))+
           ylim(c(0,lim))+
           labs(col=NULL)+
-          ggtitle(paste(design$density,' plants.ha-1'))+
+          ggtitle(paste(design$density,' palms.ha-1'))+
           coord_equal()+
           myTheme
         
@@ -304,7 +304,7 @@ server<-function(input, output,session){
           xlim(c(0,lim))+
           ylim(c(0,lim))+
           labs(col=NULL)+
-          ggtitle(paste(design$density,' plants.ha-1'))+
+          ggtitle(paste(design$density,' palms.ha-1'))+
           coord_equal()+
           myTheme
         
