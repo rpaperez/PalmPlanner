@@ -49,30 +49,31 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
   # dist_inter=h
   # designType='square'
   # pointSize=3
+
   
   if(dist_intra<0){
-    print('Intra row distance must be > 0')
-    return(NULL)
+    print('ERROR: Intra row distance must be > 0')
+    return(warng)
   }
   if(dist_inter<0){
-    print('Inter row distance must be > 0')
+    print('ERROR: Inter row distance must be > 0')
     return(NULL)
   }
   if(dist_intercrop<0){
-    print('Intercropping distance must be >= 0')
+    print('ERROR: Intercropping distance must be >= 0')
     return(NULL)
   }
   
   
   if (!designType %in% c('square','square2','quincunx','quincunx2','quincunx3','quincunx4','quincunx5')){
-    print('please select a designType among square quincunx quincunx3 quincunx4 quincunx5')
+    print('ERROR: please select a designType among square quincunx quincunx3 quincunx4 quincunx5')
     return(NULL)
   }
   # Voronoi of the design:
   
   if (designType=='square'){
     if(dist_intercrop>0){
-      print('Intercropping distance must be 0 m for square design')
+      print('ERROR: Intercropping distance must be 0 m for square design')
       return(NULL)
     }
     x1=dist_inter/2
@@ -91,7 +92,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
   
   if (designType=='quincunx'){
     if(dist_intercrop>0){
-      print('Intercropping distance must be 0m for quincunx design')
+      print('ERROR: Intercropping distance must be 0m for quincunx design')
       return(NULL)
     }
     x1=dist_inter/2
@@ -111,7 +112,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
   if (designType=='quincunx2'){
     
     if(dist_intercrop==0){
-      print('Intercropping distance must > 0 m for quincunx2 design')
+      print('ERROR: Intercropping distance must > 0 m for quincunx2 design')
       return(NULL)
     }
     
@@ -132,7 +133,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
   if (designType=='square2'){
     
     if(dist_intercrop==0){
-      print('Intercropping distance must > 0 m for square2 design')
+      print('ERROR: Intercropping distance must > 0 m for square2 design')
       return(NULL)
     }
     x1=dist_inter/2
@@ -154,7 +155,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
   
   if (designType=='quincunx3'){
     if(dist_intercrop==0){
-      print('please provide dist_intercrop in quincunx3 design')
+      print('ERROR:please provide dist_intercrop in quincunx3 design')
       return(NULL)}
     
     x1=dist_inter/2
@@ -289,22 +290,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
   
   visu=plot_bounds
   
-  # # result to export scene pattern
-  # if (orientation=='NS'){
-  #   result=
-  #     voronoi_plot%>%
-  #     dplyr::mutate(z= 0.0, scale= 1.0,
-  #                   inclinationAzimut= 0.0, inclinationAngle= 0.0,
-  #                   stemTwist= twist)
-  # }
-  # 
-  # if (orientation=='EW'){
-  #   result=
-  #     voronoi_plot%>%
-  #     dplyr::mutate(z= 0.0, scale= 1.0,
-  #                   inclinationAzimut= 0.0, inclinationAngle= 0.0,
-  #                   stemTwist= twist)
-  # }
+
   
   list(design=design, voronoi_plot=voronoi_plot,plot= visu,density=density)
   
@@ -314,7 +300,12 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
 
 # add intercrop design ----------------------------------------------------
 
-#' Title
+
+sizeDesign=data.frame(designType=c('square','quincunx','square2','quincunx2','quincunx3','quincunx4','quincunx5'),
+                      nLines=c(1,1,2,2,3,4,5)) %>% 
+  mutate(interLines=nLines-1)
+
+#' design_intercrop generate an intercrop design
 #'
 #' @param dist_intra distance within row of palm trees (m)
 #' @param dist_inter distance between rows of palm trees (m)
@@ -332,90 +323,92 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
 #' @export
 #'
 #' @examples
-plot_intercrop=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,twist=twist,pointSize=5,lim=50,I_dist_intra=NULL,I_dist_inter=NULL,I_designType=NULL){
+design_intercrop=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designType=NULL,orientation=orientation,twist=twist,pointSize=5,lim=50,I_dist_intra=NULL,I_dist_inter=NULL,I_designType=NULL){
   
-  # I_dist_intra=2
-  # I_dist_inter=3
-  # I_designType='quincunx3'
-  
-  # d_intercrop=12
-  # d_intra=10
-  # lim=100
-  # d_inter=7
-  # designType='quincunx5'
+  ### get distance between intercrop edge and palms row
+  dist_edge=(dist_intercrop-sizeDesign[sizeDesign==I_designType,]$interLines*I_dist_inter)/2
   
   if(designType %in% c('square','quincunx')){
-    dist_intercrop=0}
+    dist_intercrop=0
+    dist_edge=(dist_inter-sizeDesign[sizeDesign==I_designType,]$interLines*I_dist_inter)/2
+    if(I_designType %in% c('square','quincunx')){
+      dist_edge=dist_inter/2
+    }
+  }
   
+  # print(dist_edge)
+  if((dist_edge)<0){
+    print('!!! intercroping area is larger than intercropping space between palm rows')
+    return(NULL)
+  }
+  
+  ### first generate palm design
   a=plot_design(dist_intra=dist_intra,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designType,orientation=orientation,twist=twist,pointSize=pointSize,lim=lim)
   
-  # print(nrow(a$voronoi_plot))
+  #### then generate intercrops design
   
-  ### get the middle and distance between intercrop area
+  ### get distance between 2 consecutive intercropping areas (D_intercrops)
+  D_intercrops=2*dist_edge+sizeDesign[sizeDesign==designType,]$interLines*dist_inter
   
-  if(designType %in% c('square','quincunx')){
-    middle=min(a$voronoi_plot$x)+dist_inter/2
-    D_intercrop=dist_inter
-  }
-  
-  
-  if(designType %in% c('square2','quincunx2')){
-    middle=min(a$voronoi_plot$x)+dist_intercrop/2
-    D_intercrop=dist_intercrop+(nrow(a$voronoi_plot)-1)*dist_inter
-  }
-  
-  if(designType %in% c('quincunx3','quincunx4','quincunx5')){
-    middle=min(a$voronoi_plot$x)+dist_inter+dist_intercrop/2
-    D_intercrop=dist_intercrop+(nrow(a$voronoi_plot)-1)*dist_inter
-  }
-  
-  
-  
+
   if(I_designType %in% c('square','quincunx')){
-    dist_intercrop2=D_intercrop
-    b=plot_design(dist_intra=I_dist_intra,dist_inter=dist_intercrop2,dist_intercrop=0,designType=I_designType,orientation=orientation,twist=twist,pointSize=pointSize,lim=2*lim)
-    interCrop=b$design %>% 
-      mutate(x=x-min(x)+middle,y=y-min(y))
+    I_dist_inter=D_intercrops
+    D_intercrops=0
+    print(paste('I_dist_inter is fixed to: ',I_dist_inter,'m'))
   }
   
-  if(I_designType %in% c('square2','quincunx2','quincunx3','quincunx4','quincunx5')){
-    dist_intercrop2=D_intercrop-(nrow(a$voronoi_plot)-1)*I_dist_inter
-    b=plot_design(dist_intra=I_dist_intra,dist_inter=I_dist_inter,dist_intercrop=dist_intercrop2,designType=I_designType,orientation=orientation,twist=twist,pointSize=pointSize,lim=2*lim) 
+
+  b=plot_design(dist_intra=I_dist_intra,dist_inter=I_dist_inter,dist_intercrop=D_intercrops,designType=I_designType,orientation=orientation,twist=twist,pointSize=pointSize,lim=2*lim) 
   
-    interCrop=b$design %>% 
-      filter(x>b$design$x[nrow(b$voronoi_plot)-1]) %>% 
-      mutate(x=x-min(x)+middle-(nrow(b$voronoi_plot)-1)*I_dist_inter/2,y=y-min(y))
-  }
+  ### keep full intercropping area (remove first rows)
+  I_removeL=min(2,sizeDesign[sizeDesign$designType==I_designType,]$nLines-1) ### lines to remove
+  I_start=ifelse(I_removeL>0,unique(b$design$x)[I_removeL],0)
   
+  offSetL=max(1,min(2,sizeDesign[sizeDesign$designType==designType,]$nLines-1)) ### first lines  in palm design to get the offset of intercropping area
   
+  interCrop=  b$design %>% 
+    filter(x>I_start) %>% 
+    mutate(x=x-min(x)+unique(a$design$x)[offSetL]+dist_edge,y=y-min(y)) ### add the offset (dist_edge)
   
   visu=a$design %>% 
     ggplot(aes(x=x,y=y))+
-    geom_point()+
-    geom_point(data=interCrop,aes(x=x,y=y,col='intercrop'))+
+    geom_point(aes(col= 'palms'),shape=8,size=pointSize)+
+    geom_point(data=interCrop,aes(x=x,y=y,col='intercrop'),size=pointSize-1)+
     xlim(c(0,lim))+
-    ylim(c(0,lim))
+    ylim(c(0,lim))+
+    scale_color_manual(name='',values = c('palms'='forestgreen','intercrop'='black'))
   
-  return(visu)
-  
+  result=list(designPalm=a$design,designI=interCrop,plot=visu)
+  return(result)
 }
 
 
 # test --------------------------------------------------------------------
 
 
-
-dist_intercrop=12
-dist_intra=10
-dist_inter=7
-designType='quincunx5'
-I_dist_intra=2
-I_dist_inter=3
-I_designType='quincunx'
-lim=100
-orientation='NS'
-twist=0
-pointSize=3
-
-plot_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designType,dist_intercrop =dist_intercrop,orientation = orientation,twist = twist,pointSize =pointSize,lim = lim, I_dist_intra = I_dist_intra,I_dist_inter =I_dist_inter,I_designType = I_designType)
+# 
+# dist_intercrop=0
+# dist_intra=5
+# dist_inter=10
+# designType='quincunx'
+# I_dist_intra=5
+# I_dist_inter=10
+# I_designType='quincunx3'
+# lim=100
+# orientation='NS'
+# twist=0
+# pointSize=3
+# 
+# 
+# I1=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designType,dist_intercrop =dist_intercrop,orientation = orientation,twist = twist,pointSize =pointSize,lim = lim, I_dist_intra = I_dist_intra,I_dist_inter =I_dist_inter,I_designType = I_designType)
+# # 
+# I2=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designType,dist_intercrop =dist_intercrop,orientation = orientation,twist = twist,pointSize =pointSize,lim = lim, I_dist_intra = 2,I_dist_inter =4,I_designType = 'quincunx4')
+# 
+# 
+# ggplot()+
+#   geom_point(data=I1$designPalm,aes(x=x,y=y,col= 'palms'),shape=8,size=pointSize)+
+#   geom_point(data=I1$designI,aes(x=x,y=y,col='intercrop1'),size=pointSize-1,alpha=0.8)+
+#   geom_point(data=I2$designI,aes(x=x,y=y,col='intercrop2'),size=pointSize-1,pch=17,alpha=0.8)+
+#   xlim(c(0,lim))+
+#   ylim(c(0,lim))
 
