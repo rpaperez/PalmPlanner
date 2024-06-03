@@ -180,13 +180,13 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
       return(NULL)}
     
     x1=dist_inter/2
-    y1=dist_intra/4
+    y1=dist_intra/2
     x2=x1+dist_inter
     y2=y1
     x3=x2+dist_intercrop
     y3=y2
     xmax=x3+dist_inter/2
-    ymax=y3+dist_intra/4
+    ymax=y3+dist_intra/2
     
     voronoi_plot= data.frame(x= c(x1,x2,x3),
                              y= c(y1,y2,y3),
@@ -224,7 +224,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
       return(NULL)}
     
     x1=dist_inter/2
-    y1=dist_intra/4
+    y1=dist_intra/2
     x2=x1+dist_inter
     y2=y1
     x3=x2+dist_intercrop
@@ -232,7 +232,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
     x4=x3+dist_inter
     y4=y2
     xmax=x4+dist_inter/2
-    ymax=y4+dist_intra/4
+    ymax=y4+dist_intra/2
     
     voronoi_plot= data.frame(x= c(x1,x2,x3,x4),
                              y= c(y1,y2,y3,y4),
@@ -274,7 +274,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
     
     
     x1=dist_inter/2
-    y1=dist_intra/4
+    y1=dist_intra/2
     x2=x1+dist_inter
     y2=y1
     x3=x2+dist_intercrop
@@ -284,7 +284,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
     x5=x4+dist_inter
     y5=y3
     xmax=x5+dist_inter/2
-    ymax=y5+dist_intra/4
+    ymax=y5+dist_intra/2
     
     voronoi_plot= data.frame(x= c(x1,x2,x3,x4,x5),
                              y= c(y1,y2,y3,y4,y5),
@@ -481,3 +481,8 @@ design_intercrop=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,de
 #   xlim(c(0,lim))+
 #   ylim(c(0,lim))
 
+
+# test=plot_design(dist_intra = 2,dist_inter = 4,dist_intercrop = 6,designType = 'square4',orientation = 'NS',twist = 0,pointSize = 2,lim = 50)
+# 
+# test$plot+
+#   ylim(c(-50,50))
