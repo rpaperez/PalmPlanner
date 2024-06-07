@@ -1,8 +1,4 @@
 # Load packages -----------------------------------------------------------
-
-
-
-
 packs <- c('shiny','shinythemes','shinycssloaders',"lubridate", "stringr", 'tidyverse','viridis','plotly','devtools')
 InstIfNec<-function (pack) {
   if (!do.call(require,as.list(pack))) {
@@ -39,6 +35,7 @@ ui<-shinyUI(
              
              sidebarLayout( 
                sidebarPanel(
+                 uiOutput('ui.action'),
                  tabsetPanel(
                    tabPanel("Palms",
                             selectInput(inputId="designType", label = h4("Select design pattern"),
@@ -53,8 +50,8 @@ ui<-shinyUI(
                                                        "1/6"='1/6'),
                                         selected = '0'),      
                             
-                            numericInput("inter_dist",label = h4("Inter palm row distance (m):"), value=10,step = 0.1,min = 0),
-                            numericInput("intra_dist",label = h4("Intra palm row distance (m):"), value=5,step = 0.1,min = 0),
+                            numericInput("inter_dist",label = h4("Inter palm row distance (m):"), value=7.8,step = 0.1,min = 0),
+                            numericInput("intra_dist",label = h4("Intra palm row distance (m):"), value=9,step = 0.1,min = 0),
                             numericInput("dist_intercrop",label = h4("Intercropping distance (m):"), value=0,step = 0.1,min = 0),
                             
                             # selectInput(inputId="orientation", label = h4("Select scene orientation & plot arguments"),
@@ -105,7 +102,7 @@ ui<-shinyUI(
                                         selected =0), 
                             numericInput("inter_dist_I2",label = h4("Inter row distance (m):"), value=NULL,step = 0.1,min = 0),
                             numericInput("intra_dist_I2",label = h4("Intra row distance (m):"), value=NULL,step = 0.1,min = 0),
-                            numericInput("offset_Y_I2",label = h4("y offset (m)"), value=0,step = 0.05),
+                            numericInput("offset_Y_I2",label = h4("y offset (m)"), value=0,step = 0.05,max = 0),
                             tags$hr(),
                             numericInput("pointSizeInt2",label = h4("Select point size:"), value=2,step = 0.1,min = 0),
                             colourInput("colInt2", h4("Select colour"), "red"),
@@ -127,24 +124,46 @@ ui<-shinyUI(
                                         selected =0), 
                             numericInput("inter_dist_I3",label = h4("Inter row distance (m):"), value=NULL,step = 0.1,min = 0),
                             numericInput("intra_dist_I3",label = h4("Intra row distance (m):"), value=NULL,step = 0.1,min = 0),
-                            numericInput("offset_Y_I3",label = h4("y offset (m)"), value=0,step = 0.05),
+                            numericInput("offset_Y_I3",label = h4("y offset (m)"), value=0,step = 0.05,max = 0),
                             tags$hr(),
                             numericInput("pointSizeInt3",label = h4("Select point size:"), value=2,step = 0.1,min = 0),
                             colourInput("colInt3", h4("Select colour"), "purple"),
                             
                    ),
+                   tabPanel("Replanting",
+                            checkboxInput('replant',label = 'visualize old palms',value = F),
+                            selectInput(inputId="designTypeR", label = h4("Select design pattern"),
+                                        choices = list("square" = 'square',
+                                                       'quincunx'='quincunx'),
+                                        selected = 'quincunx'),
+                            numericInput("inter_distR",label = h4("Inter palm row distance (m):"), value=7.8,step = 0.1,min = 0),
+                            numericInput("intra_distR",label = h4("Intra palm row distance (m):"), value=9,step = 0.1,min = 0),
+                            numericInput("offset_Y_R",label = h4("y offset (m)"), value=-4.5,step = 0.05,max = 0),
+                            numericInput("offset_X_R",label = h4("x offset (m)"), value=-3.9,step = 0.05,max = 0),
+                            
+                            
+                   )
                    
                  ),
                  tags$hr(),
                  tags$hr(),
                  numericInput("lim",label = h4("plot limits (m):"), value=50,step = 10,min = 0),
-                 checkboxInput('origin',label = 'Set origin to the first palm',value = T),
-                 uiOutput('ui.action')
-                 
+                 checkboxInput('origin',label = 'Set origin to the first palm',value = T)
                ),
                mainPanel(
-                 
-                 plotlyOutput('plot')%>% withSpinner(color="darkorange"))
+                 tabsetPanel(
+                   
+                   tabPanel('plot',
+                            actionButton('delete', 'Delete selected points'), 
+                            actionButton('ResetData', 'Reset data'),
+                            plotlyOutput('plot')%>% withSpinner(color="darkorange")
+                   
+                   ),
+                   tabPanel('Selection',
+                            tableOutput('table')
+                   )
+                 )
+               )
                
              )
   )
@@ -171,10 +190,6 @@ server<-function(input, output,session){
     input$dist_intercrop
   })
   
-  
-  # orientation<- reactive({
-  #   input$orientation
-  # })
   
   designType<- reactive({
     input$designType
@@ -273,6 +288,41 @@ server<-function(input, output,session){
     input$offset_Y_I3
   })
   
+  ####replanting
+  
+  replant<- reactive({
+    input$replant
+  })
+  
+  designTypeR<- reactive({
+    input$designTypeR
+  })
+  
+  inter_distR<- reactive({
+    input$inter_distR
+  })
+  
+  intra_distR<- reactive({
+    input$intra_distR
+  })
+  
+  offset_Y_R<- reactive({
+    input$offset_Y_R
+  })
+  
+  offset_X_R<- reactive({
+    input$offset_X_R
+  })
+  
+  selectP <- reactive({
+    d <- event_data("plotly_click")
+    l <- event_data("plotly_selected")
+    rbind(d,l)
+    
+  })
+  
+  df=reactiveVal()
+  
   ## condition
   
   cond<- reactive({
@@ -309,42 +359,42 @@ server<-function(input, output,session){
       if(  input$NbLines_I1==1 & !is.na(input$inter_dist_I1)){
         updateNumericInput(session, "inter_dist_I1", value = 0)
       }
-      if(  input$NbLines_I1==1 & is.na(input$intra_dist_I1) | input$NbLines_I1==1 & input$intra_dist_I1==0){   updateNumericInput(session, "intra_dist_I1", value = 1)
+      if(  input$NbLines_I1==1 & is.na(input$intra_dist_I1) | input$NbLines_I1==1 & input$intra_dist_I1==0){   updateNumericInput(session, "intra_dist_I1", value = 5)
       }
       
       if(input$NbLines_I2==1 &  !is.na(input$inter_dist_I2)){
         updateNumericInput(session, "inter_dist_I2", value = 0)
       }
       if(  input$NbLines_I2==1 & is.na(input$intra_dist_I2)|input$NbLines_I2==1 & input$intra_dist_I2==0){
-        updateNumericInput(session, "intra_dist_I2", value = 1)
+        updateNumericInput(session, "intra_dist_I2", value = 5)
       }
       
       if(input$NbLines_I3==1 &  !is.na(input$inter_dist_I3)){
         updateNumericInput(session, "inter_dist_I3", value = 0)
       }
       if(  input$NbLines_I3==1 & is.na(input$intra_dist_I3)|input$NbLines_I3==1 & input$intra_dist_I3==0){
-        updateNumericInput(session, "intra_dist_I3", value = 1)
+        updateNumericInput(session, "intra_dist_I3", value = 5)
       }
       
       ## avoid inter row null when multiple row design is selected
       
       if(  input$NbLines_I1>1 & is.na(input$inter_dist_I1) | input$NbLines_I1>1 & !is.na(input$inter_dist_I1) & input$inter_dist_I1==0){
-        updateNumericInput(session, "inter_dist_I1", value = 1)
+        updateNumericInput(session, "inter_dist_I1", value = 5)
       }
       if(  input$NbLines_I1>1 & is.na(input$intra_dist_I1) | input$NbLines_I1>1 & !is.na(input$intra_dist_I1) & input$intra_dist_I1==0){
-        updateNumericInput(session, "intra_dist_I1", value = 1)
+        updateNumericInput(session, "intra_dist_I1", value = 5)
       }
       
       if(  input$NbLines_I2>1 &  is.na(input$inter_dist_I2)| input$NbLines_I2>1 & input$inter_dist_I2==0){
-        updateNumericInput(session, "inter_dist_I2", value = 1)
+        updateNumericInput(session, "inter_dist_I2", value = 5)
       }
-      if(  input$NbLines_I2>1 & is.na(input$intra_dist_I2) | input$NbLines_I2>1 & input$intra_dist_I2==0){      updateNumericInput(session, "intra_dist_I2", value = 1)
+      if(  input$NbLines_I2>1 & is.na(input$intra_dist_I2) | input$NbLines_I2>1 & input$intra_dist_I2==0){      updateNumericInput(session, "intra_dist_I2", value = 5)
       }
       
       if(  input$NbLines_I3>1 &  is.na(input$inter_dist_I3)| input$NbLines_I3>1 & input$inter_dist_I3==0){
-        updateNumericInput(session, "inter_dist_I3", value = 1)
+        updateNumericInput(session, "inter_dist_I3", value = 5)
       }
-      if(  input$NbLines_I3>1 & is.na(input$intra_dist_I3) | input$NbLines_I3>1 & input$intra_dist_I3==0){      updateNumericInput(session, "intra_dist_I3", value = 1)
+      if(  input$NbLines_I3>1 & is.na(input$intra_dist_I3) | input$NbLines_I3>1 & input$intra_dist_I3==0){      updateNumericInput(session, "intra_dist_I3", value = 5)
       }
       
     })
@@ -360,7 +410,6 @@ server<-function(input, output,session){
       d_inter=inter_dist()
       d_intra=intra_dist()
       dist_intercrop=dist_intercrop()
-      # orientation=orientation()
       orientation='NS'
       designType=designType()
       NbRemoved=NbRemoved()
@@ -389,22 +438,25 @@ server<-function(input, output,session){
       Int3=Int3()
       offset_Y_I3=offset_Y_I3()
       
+      designTypeR=designTypeR()
+      inter_distR=inter_distR()
+      intra_distR=intra_distR()
+      offset_Y_R=offset_Y_R()
+      offset_X_R=offset_X_R()
+      replant=replant()
+
+      
       if (is.null(d_inter) | is.null(d_intra)) {
         return(NULL)
       }
       
-      ## lunch simu
+      ###init
       
-      tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3)
-      
+      I1=NULL
+      I2=NULL
+      I3=NULL
       
       #### map
-      # print(paste('dist_intra',d_intra))
-      # print(paste('dist_inter',d_inter))
-      # print(paste('dist_intercrop',dist_intercrop))
-      # print(paste('designType',designType))
-      # print(paste('orientation',orientation))
-      # print(paste('lim',lim))
       designRef=tableDesign %>% filter(design==designType & NbR==NbRemoved) %>% select(designRef)
       
       design=plot_design(dist_intra=d_intra,dist_inter=d_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSize,lim=lim,twist=0)
@@ -416,17 +468,10 @@ server<-function(input, output,session){
         design$design$y=design$design$y-y_offset
       }
       
-      Id=paste0(design$density,' palms.ha-1')
-      names(tableColor)=c(Id,Int1,Int2,Int3)
-      
-      gr=ggplot()+
-        geom_point(data=design$design,aes(x=x,y=y,col= Id),shape=8,size=pointSize)+
-        xlim(c(-1,lim))+
-        ylim(c(-1,lim))+
-        labs(col=NULL)+
-        coord_equal()+
-        scale_color_manual(values = tableColor)+
-        myTheme
+      design$design=design$design %>% 
+        mutate(type='palms',
+               Id=paste0(design$density,' palms.ha-1'),
+               size=input$pointSize)
       
       
       ### with intercrops####
@@ -445,6 +490,10 @@ server<-function(input, output,session){
         }
         
         I1$designI$y= I1$designI$y+offset_Y_I1
+        I1$designI=I1$designI %>% 
+          mutate(type='I1',
+                 Id=paste0(I1$density,' ',Int1,'.ha-1'),
+                 size=input$pointSizeInt1)
       }
       
       if ( NbLines_I2>0){
@@ -463,6 +512,10 @@ server<-function(input, output,session){
         }
         
         I2$designI$y= I2$designI$y+offset_Y_I2
+        I2$designI= I2$designI%>% 
+          mutate(type='I2',
+                 Id=paste0(I2$density,' ',Int2,'.ha-1'),
+                 size=input$pointSizeInt2)
       }
       
       
@@ -482,169 +535,102 @@ server<-function(input, output,session){
           I3$designI$y=I3$designI$y-y_offset
         }
         I3$designI$y= I3$designI$y+offset_Y_I3
+        I3$designI= I3$designI %>% 
+          mutate(type='I3',
+                 Id=paste0(I3$density,' ',Int3,'.ha-1'),
+                 size=input$pointSizeInt3)
         
       }
       
       
-      ###graph intercrops #####
-      ### intercrop 1 alone####
+      # #### add old planting##### 
+      # if (replant==T){
+      #   
+      #   designRefRep=tableDesign %>% filter(design==designTypeR & NbR==0) %>% select(designRef)
+      #   
+      #   
+      #   replanting=plot_design(dist_intra=intra_distR,dist_inter=inter_distR,dist_intercrop=0,designType=designRefRep[[1]],orientation=orientation,pointSize=pointSize,lim=2*lim,twist=0)
+      #   
+      #   if(origin==T){
+      #     replanting$design$x=replanting$design$x-x_offset
+      #     replanting$design$y=replanting$design$y-y_offset
+      #   }
+      #   
+      #   replanting$design$x= replanting$design$x+offset_X_R
+      #   replanting$design$y= replanting$design$y+offset_Y_R
+      #   
+      #   gr=gr+
+      #     geom_point(data=replanting$design,aes(x=x,y=y),col='grey',shape=4,size=pointSize,alpha=0.6)
+      # }
       
-      if ( NbLines_I1>0 & NbLines_I2==0 & NbLines_I3==0){
+  
+        don=bind_rows(design$design,I1$designI,I2$designI,I3$designI)
         
-        Id=paste0(design$density,' palms.ha-1')
-        Id1=paste0(I1$density,' ',Int1,'.ha-1')
-        names(tableColor)=c(Id,Id1,Int2,Int3)
-        
-        
-        gr=ggplot()+
-          geom_point(data=I1$designPalm,aes(x=x,y=y,col= Id),shape=8,size=pointSize)+
-          geom_point(data=I1$designI,aes(x=x,y=y,col=Id1),size=input$pointSizeInt1,alpha=0.8)+
-          xlim(c(-1,lim))+
-          ylim(c(-1,lim))+
-          labs(col=NULL)+
-          scale_color_manual(values = tableColor)+
-          coord_equal()+
-          myTheme
-        
-      }
-      
-      if ( NbLines_I2>0 & NbLines_I1==0 & NbLines_I3==0){
-        Id=paste0(design$density,' palms.ha-1')
-        Id2=paste0(I2$density,' ',Int2,'.ha-1')
-        names(tableColor)=c(Id,Int1,Id2,Int3)
-        
-        gr=ggplot()+
-          geom_point(data=I2$designPalm,aes(x=x,y=y,col= Id),shape=8,size=pointSize)+
-          geom_point(data=I2$designI,aes(x=x,y=y,col=Id2),size=input$pointSizeInt2,alpha=0.8,pch=15)+
-          xlim(c(-1,lim))+
-          ylim(c(-1,lim))+
-          labs(col=NULL)+
-          scale_color_manual(values = tableColor)+
-          coord_equal()+
-          myTheme
-        
-      }
-      if ( NbLines_I3>0 & NbLines_I1==0 & NbLines_I2==0){
-        Id=paste0(design$density,' palms.ha-1')
-        Id3=paste0(I3$density,' ',Int3,'.ha-1')
-        names(tableColor)=c(Id,Int1,Int2,Id3)
-        
-        gr=ggplot()+
-          geom_point(data=I3$designPalm,aes(x=x,y=y,col= Id),shape=8,size=pointSize)+
-          geom_point(data=I3$designI,aes(x=x,y=y,col=Id3),size=input$pointSizeInt3,alpha=0.8,pch=18)+
-          xlim(c(-1,lim))+
-          ylim(c(-1,lim))+
-          labs(col=NULL)+
-          scale_color_manual(values = tableColor)+
-          coord_equal()+
-          myTheme
-        
-      }
-      
-      # ###intercrop 1+ intercrop 2 #####
-      if ( NbLines_I2>0 & NbLines_I1>0 & NbLines_I3==0){
-        
-        Id=paste0(design$density,' palms.ha-1')
-        Id1=paste0(I1$density,' ',Int1,'.ha-1')
-        Id2=paste0(I2$density,' ',Int2,'.ha-1')
-        names(tableColor)=c(Id,Id1,Id2,Int3)
-        
-        
-        gr=ggplot()+
-          geom_point(data=I1$designPalm,aes(x=x,y=y,col= Id),shape=8,size=pointSize)+
-          geom_point(data=I1$designI,aes(x=x,y=y,col=Id1),size=input$pointSizeInt1,alpha=0.6)+
-          geom_point(data=I2$designI,aes(x=x,y=y,col=Id2),size=input$pointSizeInt2,pch=15,alpha=0.6)+
-          xlim(c(-1,lim))+
-          ylim(c(-1,lim))+
-          labs(col=NULL)+
-          scale_color_manual(values = tableColor)+
-          coord_equal()+
-          myTheme
-        
-      }
-      
-      ###intercrop 1+ intercrop 3 #####
-      if ( NbLines_I3>0 & NbLines_I1>0 & NbLines_I2==0){
-        
-        Id=paste0(design$density,' palms.ha-1')
-        Id1=paste0(I1$density,' ',Int1,'.ha-1')
-        Id3=paste0(I3$density,' ',Int3,'.ha-1')
-        names(tableColor)=c(Id,Id1,Int2,Id3)
-        
-        
-        gr=ggplot()+
-          geom_point(data=I1$designPalm,aes(x=x,y=y,col= Id),shape=8,size=pointSize)+
-          geom_point(data=I1$designI,aes(x=x,y=y,col=Id1),size=input$pointSizeInt1,alpha=0.6)+
-          geom_point(data=I3$designI,aes(x=x,y=y,col=Id3),size=input$pointSizeInt3,pch=18,alpha=0.6)+
-          xlim(c(-1,lim))+
-          ylim(c(-1,lim))+
-          labs(col=NULL)+
-          scale_color_manual(values = tableColor)+
-          coord_equal()+
-          myTheme
-        
-      }
-      
-      ###intercrop 2+ intercrop 3 #####
-      if ( NbLines_I3>0 & NbLines_I2>0 & NbLines_I1==0){
-        
-        Id=paste0(design$density,' palms.ha-1')
-        Id2=paste0(I1$density,' ',Int2,'.ha-1')
-        Id3=paste0(I3$density,' ',Int3,'.ha-1')
-        names(tableColor)=c(Id,Int1,Id2,Id3)
-        
-        
-        gr=ggplot()+
-          geom_point(data=I2$designPalm,aes(x=x,y=y,col= Id),shape=8,size=pointSize)+
-          geom_point(data=I2$designI,aes(x=x,y=y,col=Id2),size=input$pointSizeInt2,pch=15,alpha=0.6)+
-          geom_point(data=I3$designI,aes(x=x,y=y,col=Id3),size=input$pointSizeInt3,pch=18,alpha=0.6)+
-          xlim(c(-1,lim))+
-          ylim(c(-1,lim))+
-          labs(col=NULL)+
-          scale_color_manual(values = tableColor)+
-          coord_equal()+
-          myTheme
-        
-      }
-      
-      ###intercrop 1+ intercvrop 2+ intercrop 3 #####
-      if ( NbLines_I1>0 & NbLines_I2>0 & NbLines_I3>0){
-        
-        Id=paste0(design$density,' palms.ha-1')
-        Id1=paste0(I1$density,' ',Int1,'.ha-1')
-        Id2=paste0(I1$density,' ',Int2,'.ha-1')
-        Id3=paste0(I3$density,' ',Int3,'.ha-1')
-        names(tableColor)=c(Id,Id1,Id2,Id3)
-        
-        
-        gr=ggplot()+
-          geom_point(data=I1$designPalm,aes(x=x,y=y,col= Id),shape=8,size=pointSize)+
-          geom_point(data=I1$designI,aes(x=x,y=y,col=Id1),size=input$pointSizeInt1,alpha=0.6)+
-          geom_point(data=I2$designI,aes(x=x,y=y,col=Id2),size=input$pointSizeInt2,pch=15,alpha=0.6)+
-          geom_point(data=I3$designI,aes(x=x,y=y,col=Id3),size=input$pointSizeInt3,pch=18,alpha=0.6)+
-          xlim(c(-1,lim))+
-          ylim(c(-1,lim))+
-          labs(col=NULL)+
-          scale_color_manual(values = tableColor)+
-          coord_equal()+
-          myTheme
-        
-      }
-      
-      
-      gr
-      
+      return(don)
       
     })
   })
   
-  # plot 
+  
+  observeEvent(input$delete,{
+    don=result()
+    sub=don %>% filter(!(x %in% selectP()$x & y %in% selectP()$y))
+    
+    df(sub)
+    
+  })
+  
+  observeEvent(input$ResetData, {
+    df(result())
+  })
+  
+  observeEvent(input$action, {
+    df(result())
+  })
+  
+
+  
+  
+
+  
+  
+  #### graphic####
   plot<-reactive({
     cond<- cond()
-    result<- result()
-    if (is.null(result)) return(NULL)
+    lim=lim()
+    result=result()
     
-    ggplotly(result,height = 800,width=800)
+    df<- df()
+    if (is.null(df)){
+      df(result())
+    } 
+    
+    
+    tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3)
+    
+    names(tableColor)=c(unique(df[df$type=='palms','Id']),
+                        unique(df[df$type=='I1','Id']),
+                        unique(df[df$type=='I2','Id']),
+                        unique(df[df$type=='I3','Id']))
+    
+    print(tableColor)
+    tableShape=c(8,1,15,18) 
+    names(tableShape)=names(tableColor)
+    
+    gr=ggplot()+
+      geom_point(data=df,aes(x=x,y=y,col= Id,pch=Id,size=size))+
+      # geom_point(data=I1$designI,aes(x=x,y=y,col=Id1),size=input$pointSizeInt1,alpha=0.6)+
+      # geom_point(data=I2$designI,aes(x=x,y=y,col=Id2),size=input$pointSizeInt2,pch=15,alpha=0.6)+
+      # geom_point(data=I3$designI,aes(x=x,y=y,col=Id3),size=input$pointSizeInt3,pch=18,alpha=0.6)+
+      xlim(c(-1,lim))+
+      ylim(c(-1,lim))+
+      labs(col=NULL)+
+      scale_color_manual(values = tableColor)+
+      scale_shape_manual(values=tableShape)+
+      coord_equal()+
+      myTheme
+    
+    ggplotly(gr,height = 800,width=800,source = "A")
   })
   
   # Outputs -----------------------------------------------------------------
@@ -656,6 +642,11 @@ server<-function(input, output,session){
   output$ui.action <- renderUI({
     actionButton("action", "Visualize the design")
   })
+  
+  output$table<- renderTable({
+    selectP()[,c('x','y')]
+  })
+  
 }
 
 shinyApp(ui, server)

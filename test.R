@@ -1,23 +1,65 @@
-# Load packages -----------------------------------------------------------
-# require("devtools")
-# devtools::install_github("daattali/colourpicker")
-
-packs <- c('shiny','shinythemes','shinycssloaders',"lubridate", "stringr", 'tidyverse','viridis','plotly',"colourpicker")
-InstIfNec<-function (pack) {
-  if (!do.call(require,as.list(pack))) {
-    do.call(install.packages,as.list(pack))  }
-  do.call(require,as.list(pack))}
-lapply(packs, InstIfNec)
 library(shiny)
-shinyApp(
-  ui = fluidPage(
-    colourInput("col", "Select colour", "purple"),
-    plotOutput("plot")
-  ),
-  server = function(input, output) {
-    output$plot <- renderPlot({
-      set.seed(1)
-      plot(rnorm(50), bg = input$col, col = input$col, pch = 21)
-    })
-  }
+library(plotly)
+
+ui <- fluidPage(
+  plotlyOutput("plot"),
+  verbatimTextOutput("click"),
+  verbatimTextOutput("brush"),
+  tableOutput('table'),
+  actionButton('delete', 'DeleteData ? '), 
+  actionButton('ResetData', 'Reset data')
 )
+
+server <- function(input, output, session) {
+  
+  nms <- row.names(mtcars)
+  don=data.frame(x=mtcars$mpg,y=mtcars$wt)
+  df=reactiveVal(don)
+ 
+  output$plot <- renderPlotly({
+    p <- ggplot(df(), aes(x = x, y = y)) + geom_point()
+    ggplotly(p)
+  })
+  
+
+  selectP <- reactive({
+    d <- event_data("plotly_click")
+    l <- event_data("plotly_selected")
+    rbind(d,l)
+    
+  })
+  
+  result<- reactive({
+    don=mtcars
+    result=don %>% filter(mpg %in% selectP()$x & wt %in% selectP()$y) %>% 
+      mutate(x=mpg,y=wt)
+    return(result)
+  }) 
+  
+
+  observeEvent(input$delete,{
+    # df()
+    df(result())
+  
+  })
+  
+  observeEvent(input$ResetData, {
+    df(don)
+  })
+  
+  output$table<- renderTable({
+    selectP()[,c('x','y')]
+  })
+  
+
+  
+  # 
+  # output$brush <- renderPrint({
+  #   d <- event_data("plotly_selected")
+  #   if (!is.null(d)) d
+  # })
+
+  
+}
+
+shinyApp(ui, server)
