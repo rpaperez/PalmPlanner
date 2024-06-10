@@ -34,7 +34,7 @@ Additionally, the colourpicker package is required and will be installed from Gi
 
 ## Usage {#usage}
 
-On the right, you'll find 4 tab sets where you can modify the parameters for each crop. The first tab, ``PALMS`` contains arguments for designing the oil palm planting pattern. The other tabs, ``INTERCROP1``, ``INTERCROP2`` and ``INTERCROP3`` are for the intercrops.
+On the right, you'll find 5 tab sets where you can modify the parameters for each crop. The first tab, ``PALMS`` contains arguments for designing the oil palm planting pattern. The other tabs, ``INTERCROP1``, ``INTERCROP2`` and ``INTERCROP3`` are for the intercrops and the last tab ``REPLANTING`` is for representing an old planting.
 
 ### Oil palm arguments
 
@@ -75,6 +75,26 @@ In each ``INTERCROP`` tab, you can modify the following arguments:
 
 ``Select colour`` : colour of  point in the plot.
 
+### Replanting  arguments
+
+In the ``REPLANTING`` tab, you can modify the following arguments:
+
+``visualize old palms``: check box for plotting the old palm positions (default is unchecked box)
+
+``Select design pattern``: type of design, quincunx (tresbolio) or square (cuadrado) 
+
+``Inter palm row distance (m)``: distance between rows of palms
+
+``Intra palm row distance (m)``: distance within rows of oil palm
+
+``x offset (m)``: distance to adapt vertical alignment between old oil palms and replanted palms. The value is negative to change intercrops point down in the plot.
+
+``y offset (m)``: distance to adapt horizontal alignment between old oil palms and replanted palms. The value is negative to change intercrops point down in the plot.
+
+``Select point size`` : size of point in the plot
+
+
+
 ### Plot arguments
 
 Additional plot arguments include:
@@ -84,3 +104,9 @@ Additional plot arguments include:
 ``origin``: set the origin of the plot to the first palm (default)
 
 ``Visalize the design``: button to update the design based on the entered arguments.
+
+``DELETED SELECTED POINTS``: button to delete the points selected when clicking on the plot, or selected with the lasso tool. The selected points are listed in the ``SELECTION`` tab. To unselect points, double click and/or use the lasso on empty region of the plot.
+
+``RESET DATA``: button to return to the original plot before removing points.
+
+

@@ -395,11 +395,12 @@ times to install all the packages.</p>
 </div>
 <div id="usage" class="section level2">
 <h2>Usage</h2>
-<p>On the right, you’ll find 4 tab sets where you can modify the
+<p>On the right, you’ll find 5 tab sets where you can modify the
 parameters for each crop. The first tab, <code>PALMS</code> contains
 arguments for designing the oil palm planting pattern. The other tabs,
 <code>INTERCROP1</code>, <code>INTERCROP2</code> and
-<code>INTERCROP3</code> are for the intercrops.</p>
+<code>INTERCROP3</code> are for the intercrops and the last tab
+<code>REPLANTING</code> is for representing an old planting.</p>
 <div id="oil-palm-arguments" class="section level3">
 <h3>Oil palm arguments</h3>
 <p>In the <code>PALMS</code> tab, you can modify the following
@@ -441,6 +442,26 @@ intercrops point down in the plot.</p>
 <p><code>Select point size</code> : size of point in the plot</p>
 <p><code>Select colour</code> : colour of point in the plot.</p>
 </div>
+<div id="replanting-arguments" class="section level3">
+<h3>Replanting arguments</h3>
+<p>In the <code>REPLANTING</code> tab, you can modify the following
+arguments:</p>
+<p><code>visualize old palms</code>: check box for plotting the old palm
+positions (default is unchecked box)</p>
+<p><code>Select design pattern</code>: type of design, quincunx
+(tresbolio) or square (cuadrado)</p>
+<p><code>Inter palm row distance (m)</code>: distance between rows of
+palms</p>
+<p><code>Intra palm row distance (m)</code>: distance within rows of oil
+palm</p>
+<p><code>x offset (m)</code>: distance to adapt vertical alignment
+between old oil palms and replanted palms. The value is negative to
+change intercrops point down in the plot.</p>
+<p><code>y offset (m)</code>: distance to adapt horizontal alignment
+between old oil palms and replanted palms. The value is negative to
+change intercrops point down in the plot.</p>
+<p><code>Select point size</code> : size of point in the plot</p>
+</div>
 <div id="plot-arguments" class="section level3">
 <h3>Plot arguments</h3>
 <p>Additional plot arguments include:</p>
@@ -449,6 +470,13 @@ intercrops point down in the plot.</p>
 (default)</p>
 <p><code>Visalize the design</code>: button to update the design based
 on the entered arguments.</p>
+<p><code>DELETED SELECTED POINTS</code>: button to delete the points
+selected when clicking on the plot, or selected with the lasso tool. The
+selected points are listed in the <code>SELECTION</code> tab. To
+unselect points, double click and/or use the lasso on empty region of
+the plot.</p>
+<p><code>RESET DATA</code>: button to return to the original plot before
+removing points.</p>
 </div>
 </div>
 </div>

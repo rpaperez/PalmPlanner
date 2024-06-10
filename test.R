@@ -30,8 +30,8 @@ server <- function(input, output, session) {
   })
   
   result<- reactive({
-    don=mtcars
-    result=don %>% filter(mpg %in% selectP()$x & wt %in% selectP()$y) %>% 
+    
+    result=don %>% filter(!(mpg %in% selectP()$x & wt %in% selectP()$y)) %>% 
       mutate(x=mpg,y=wt)
     return(result)
   }) 
