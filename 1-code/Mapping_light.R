@@ -22,7 +22,7 @@ if (require('archimedR')==F){
 #' @param d_intra distance within rows of palm trees
 #' @param path_designs path to save planting designs
 #'@param d_intercrop: distance for intercrop
-#' @param designType type of design (square,square2,quincunx,quincunx2,quincunx3,quincunx4,quincunx5)
+#' @param designType type of design 
 #' @param paramFileName name of the Vpalm param file (.txt)
 #' @param orientation orientation of the scene (NS: North-South or EW: East-West)
 #' @param lim limit of the area for plotting map (m)
@@ -32,25 +32,25 @@ if (require('archimedR')==F){
 #' @export csv file of the map
 #'
 #' @examples
-Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop,path_designs=path_designs,paramFileName=paramFileName,orientation=orientation,twist=twist,lim=50){
+Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_intercrop=d_intercrop,path_designs=path_designs,paramFileName=paramFileName,orientation=orientation,lim=50){
   
-  # d_inter=12
-  # d_intra=12
+  # d_inter=15.6
+  # d_intra=18
   # d_intercrop=NULL
   # path_designs='2-outputs/Run_simu/planting_designs/'
-  # paramFileName='DA1_Average_MAP_90'
-  # orientation='EW'
+  # paramFileName='Mockup_seed1_MAP_180'
+  # orientation='NS'
   # lim=50
   # designType='square'
   
   # design_name=paste0('inter',d_inter,'-intra',d_intra)
   
-  if (designType %in% c('square','square_bis','quincunx','quincunx_bis')){
-    design_name=paste0(designType,'_inter',d_inter,'_intra',d_intra,'_twist',twist)
+  if (designType %in% c('square','quincunx')){
+    design_name=paste0(designType,'_inter',d_inter,'_intra',d_intra)
     
   }
-  if (!(designType %in% c('square','square_bis','quincunx','quincunx_bis'))){
-    design_name=paste0(designType,'_inter',d_inter,'_intra',d_intra,'_intercrop',d_intercrop,'_twist',twist)
+  if (!(designType %in% c('square','quincunx'))){
+    design_name=paste0(designType,'_inter',d_inter,'_intra',d_intra,'_intercrop',d_intercrop)
   }
   
   
@@ -216,15 +216,15 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
     plane_df_step= 
       plane_df%>%
       dplyr::mutate(Date= date,
-                    irradiation= Ra_PAR_q*area*step_duration,
-                    irradiance= Ra_PAR_q)
+                    irradiation= Ri_PAR_q*area*step_duration,
+                    irradiance= Ri_PAR_q)
     
     grid_df_day= 
       plane_df_step%>%
       filter(Design %in% unique(plane_df_step$Design))%>%
       group_by(Design,component_id)%>%
       summarise(Date= mean(.data$date),
-                Intercepted= sum(Ra_PAR_q/area*10**-6),
+                Intercepted= sum(Ri_PAR_q/area*10**-6),
                 # absEnergy_withScattering_PAR J grid-1
                 # Global intercepted radiation in J grid-1 d-1
                 # Area_plot= mean(.data$Area_plot),
@@ -247,7 +247,7 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
     
     reps=NULL
     
-    if (designType %in% c('square','square_bis','quincunx','quincunx_bis')){
+    if (designType %in% c('square','quincunx')){
       d_intercrop=0}
   
     
@@ -427,7 +427,7 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
       myTheme+
       theme(legend.position = 'bottom')
     }
-    if (designType %in% c('quincunx3')){
+    if (designType %in% c('quincunx3','square3')){
       plot=grid_fin%>%
         mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
         ggplot(aes(x=y, y=x,fill=Intercepted_rel))+
@@ -444,7 +444,7 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
         myTheme+
         theme(legend.position = 'bottom')
     }
-    if (designType %in% c('quincunx4')){
+    if (designType %in% c('quincunx4','square4')){
       plot=grid_fin%>%
         mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
         ggplot(aes(x=y, y=x,fill=Intercepted_rel))+
@@ -462,7 +462,7 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
         myTheme+
         theme(legend.position = 'bottom')
     }
-    if (designType %in% c('quincunx5')){
+    if (designType %in% c('quincunx5','square5')){
       plot=grid_fin%>%
         mutate(Intercepted_rel=ifelse(Intercepted_rel>100,100,Intercepted_rel))%>%
         ggplot(aes(x=y, y=x,fill=Intercepted_rel))+
@@ -496,51 +496,15 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
       geom_line()+
       geom_vline(aes(xintercept = x_tree_1),col='forestgreen',lwd=1)+
       scale_color_viridis(option = 'viridis',limits = c(0, 100))+
-      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-      ylim(c(0,100))+
+      xlim(low= 0, high=lim)+
+      ylim(c(0,lim))+
       ggtitle(paste(density,' plants.ha-1'))+
       labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))+
       myTheme+
       theme(legend.position = 'none')
-    # if(orientation=="EW"){
-    #   plot2=grid_fin%>%
-    #     group_by(y)%>%
-    #     summarize(Intercepted_rel=mean(Intercepted_rel),
-    #               y_tree_1=mean(y_tree_1))%>%
-    #     ungroup()%>%
-    #     ggplot(aes(x=y, y=Intercepted_rel,col=Intercepted_rel))+
-    #     geom_line()+
-    #     geom_vline(aes(xintercept = y_tree_1),col='forestgreen',lwd=1)+
-    #     scale_color_viridis(option = 'viridis',limits = c(0, 100))+
-    #     xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-    #     ylim(c(0,100))+
-    #     ggtitle(paste(density,' plants.ha-1'))+
-    #     labs(x = 'y (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))+
-    #     myTheme+
-    #     theme(legend.position = 'none')
-    #   
-    # }
     
   }
   
-  if (designType  %in% c('square_bis')){
-    plot2=grid_fin%>%
-      group_by(y)%>%
-      summarize(Intercepted_rel=mean(Intercepted_rel),
-                y_tree_1=mean(y_tree_1))%>%
-      ungroup()%>%
-      ggplot(aes(x=y, y=Intercepted_rel,col=Intercepted_rel))+
-      geom_line()+
-      geom_vline(aes(xintercept = y_tree_1),col='forestgreen',lwd=1)+
-      scale_color_viridis(option = 'viridis',limits = c(0, 100))+
-      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-      ylim(c(0,100))+
-      ggtitle(paste(density,' plants.ha-1'))+
-      labs(x = 'y (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))+
-      myTheme+
-      theme(legend.position = 'none')
-    
-  }
   
   
   if (designType %in% c('quincunx','quincunx2','square2')){
@@ -556,7 +520,7 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
     geom_vline(aes(xintercept = x_tree_2),col='forestgreen',lwd=1)+
     scale_color_viridis(option = 'viridis',limits = c(0, 100))+
     xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-    ylim(c(0,100))+
+    ylim(c(0,lim))+
     ggtitle(paste(density,' plants.ha-1'))+
   labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))+
     myTheme+
@@ -564,28 +528,9 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
   
   }
   
-  if (designType %in% c('quincunx_bis')){
-    plot2=grid_fin%>%
-      group_by(y)%>%
-      summarize(Intercepted_rel=mean(Intercepted_rel),
-                y_tree_1=mean(y_tree_1),
-                y_tree_2=mean(y_tree_2))%>%
-      ungroup()%>%
-      ggplot(aes(x=y, y=Intercepted_rel,col=Intercepted_rel))+
-      geom_line()+
-      geom_vline(aes(xintercept = y_tree_1),col='forestgreen',lwd=1)+
-      geom_vline(aes(xintercept = y_tree_2),col='forestgreen',lwd=1)+
-      scale_color_viridis(option = 'viridis',limits = c(0, 100))+
-      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-      ylim(c(0,100))+
-      ggtitle(paste(density,' plants.ha-1'))+
-      labs(x = 'y (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))+
-      myTheme+
-      theme(legend.position = 'none')
-    
-  }
+ 
   
-  if (designType %in% c('quincunx3')){
+  if (designType %in% c('quincunx3','square3')){
     plot2=grid_fin%>%
       group_by(x)%>%
       summarize(Intercepted_rel=mean(Intercepted_rel),
@@ -599,14 +544,14 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
       geom_vline(aes(xintercept = x_tree_2),col='forestgreen',lwd=1)+
       geom_vline(aes(xintercept = x_tree_3),col='forestgreen',lwd=1)+
       scale_color_viridis(option = 'viridis',limits = c(0, 100))+
-      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-      ylim(c(0,100))+
+      xlim(low= 0, high=lim)+
+      ylim(c(0,lim))+
       ggtitle(paste(density,' plants.ha-1'))+
       labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))+
       myTheme+
       theme(legend.position = 'none')
   }
-  if (designType %in% c('quincunx4')){
+  if (designType %in% c('quincunx4','square4')){
     plot2=grid_fin%>%
       group_by(x)%>%
       summarize(Intercepted_rel=mean(Intercepted_rel),
@@ -622,14 +567,14 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
       geom_vline(aes(xintercept = x_tree_3),col='forestgreen',lwd=1)+
       geom_vline(aes(xintercept = x_tree_4),col='forestgreen',lwd=1)+
       scale_color_viridis(option = 'viridis',limits = c(0, 100))+
-      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-      ylim(c(0,100))+
+      xlim(low= 0, high=lim)+
+      ylim(c(0,lim))+
       ggtitle(paste(density,' plants.ha-1'))+
       labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))+
       myTheme+
       theme(legend.position = 'none')
   }
-  if (designType %in% c('quincunx5')){
+  if (designType %in% c('quincunx5','square5')){
     plot2=grid_fin%>%
       group_by(x)%>%
       summarize(Intercepted_rel=mean(Intercepted_rel),
@@ -647,8 +592,8 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
       geom_vline(aes(xintercept = x_tree_4),col='forestgreen',lwd=1)+
       geom_vline(aes(xintercept = x_tree_5),col='forestgreen',lwd=1)+
       scale_color_viridis(option = 'viridis',limits = c(0, 100))+
-      xlim(low= 0, high=min(c(max(grid_fin$y),max(grid_fin$x))))+
-      ylim(c(0,100))+
+      xlim(low= 0, high=lim)+
+      ylim(c(0,lim))+
       ggtitle(paste(density,' plants.ha-1'))+
       labs(x = 'x (m)', y =  expression ('Transmitted light (%)'),col=expression ('Transmitted light (%)'))+
       myTheme+
@@ -660,7 +605,7 @@ Create_map=function(designType=designType,d_inter=d_inter,d_intra=d_intra,d_inte
   visu=ggdraw() +
     draw_plot(plot) +
     draw_image(im,x = 0.4,y = 0.4,scale=0.1)
-  
+
 
   list(plot=visu,plot2=plot2)
 }

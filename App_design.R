@@ -350,20 +350,21 @@ server<-function(input, output,session){
       
       # inactivation of inter row distance for 1 row
       
-      if(  input$NbLines_I1==1 & !is.na(input$inter_dist_I1)){
+      if(  input$NbLines_I1==1 & !is.na(input$inter_dist_I1 | input$NbLines_I1==1 & is.na(input$inter_dist_I1))){
+    
         updateNumericInput(session, "inter_dist_I1", value = 0)
       }
       if(  input$NbLines_I1==1 & is.na(input$intra_dist_I1) | input$NbLines_I1==1 & input$intra_dist_I1==0){   updateNumericInput(session, "intra_dist_I1", value = 5)
       }
       
-      if(input$NbLines_I2==1 &  !is.na(input$inter_dist_I2)){
+      if(input$NbLines_I2==1 &  !is.na(input$inter_dist_I2) | input$NbLines_I2==1 & is.na(input$inter_dist_I2)){
         updateNumericInput(session, "inter_dist_I2", value = 0)
       }
       if(  input$NbLines_I2==1 & is.na(input$intra_dist_I2)|input$NbLines_I2==1 & input$intra_dist_I2==0){
         updateNumericInput(session, "intra_dist_I2", value = 6)
       }
       
-      if(input$NbLines_I3==1 &  !is.na(input$inter_dist_I3)){
+      if(input$NbLines_I3==1 &  !is.na(input$inter_dist_I3) | input$NbLines_I3==1 & is.na(input$inter_dist_I3)){
         updateNumericInput(session, "inter_dist_I3", value = 0)
       }
       if(  input$NbLines_I3==1 & is.na(input$intra_dist_I3)|input$NbLines_I3==1 & input$intra_dist_I3==0){
@@ -453,8 +454,8 @@ server<-function(input, output,session){
       
       #### map
       designRef=tableDesign %>% filter(design==designType & NbR==NbRemoved) %>% select(designRef)
-      
-      design=plot_design(dist_intra=d_intra,dist_inter=d_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSize,lim=lim,twist=0)
+      print(paste('designRef=',designRef))
+      design=plot_design(dist_intra=d_intra,dist_inter=d_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSize,lim=lim)
       
       if(origin==T){
         x_offset=design$design$x[1]
@@ -471,9 +472,12 @@ server<-function(input, output,session){
       
       ### with intercrops####
       if ( NbLines_I1>0){
-        designRef_I1=tableDesign %>% filter(design==designType_I1 & NbLines==NbLines_I1) %>% select(designRef)
         
-        I1=design_intercrop(dist_intra =d_intra,dist_inter =d_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,twist = 0,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I1,I_dist_inter =inter_dist_I1,I_designType = designRef_I1[[1]])
+        designRef_I1=tableDesign %>% filter(design==designType_I1 & NbLines==NbLines_I1) %>% select(designRef)
+        print(paste('designRef_I1=',designRef_I1))
+        print(paste(d_intra,d_inter,designRef[[1]],dist_intercrop,orientation,pointSize,lim,intra_dist_I1,inter_dist_I1,designRef_I1[[1]]))
+        
+        I1=design_intercrop(dist_intra =d_intra,dist_inter =d_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I1,I_dist_inter =inter_dist_I1,I_designType = designRef_I1[[1]])
         
         if(origin==T){
           # x_offset=I1$designPalm$x[1]
@@ -494,7 +498,7 @@ server<-function(input, output,session){
       if ( NbLines_I2>0){
         designRef_I2=tableDesign %>% filter(design==designType_I2 & NbLines==NbLines_I2) %>% select(designRef)
         
-        I2=design_intercrop(dist_intra =d_intra,dist_inter =d_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,twist = 0,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I2,I_dist_inter =inter_dist_I2,I_designType = designRef_I2[[1]])
+        I2=design_intercrop(dist_intra =d_intra,dist_inter =d_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I2,I_dist_inter =inter_dist_I2,I_designType = designRef_I2[[1]])
         
         if(origin==T){
           # x_offset=I2$designPalm$x[1]
@@ -518,7 +522,7 @@ server<-function(input, output,session){
         designRef_I3=tableDesign %>% filter(design==designType_I3 & NbLines==NbLines_I3) %>% select(designRef)
         
         
-        I3=design_intercrop(dist_intra =d_intra,dist_inter =d_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,twist = 0,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I3,I_dist_inter =inter_dist_I3,I_designType = designRef_I3[[1]])
+        I3=design_intercrop(dist_intra =d_intra,dist_inter =d_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I3,I_dist_inter =inter_dist_I3,I_designType = designRef_I3[[1]])
         
         if(origin==T){
           # x_offset=I3$designPalm$x[1]
@@ -545,7 +549,7 @@ server<-function(input, output,session){
         designRefRep=tableDesign %>% filter(design==designTypeR & NbR==0) %>% select(designRef)
         
         
-        replanting=plot_design(dist_intra=intra_distR,dist_inter=inter_distR,dist_intercrop=0,designType=designRefRep[[1]],orientation=orientation,pointSize=pointSize,lim=2*lim,twist=0)
+        replanting=plot_design(dist_intra=intra_distR,dist_inter=inter_distR,dist_intercrop=0,designType=designRefRep[[1]],orientation=orientation,pointSize=pointSize,lim=2*lim)
         
         if(origin==T){
           replanting$design$x=replanting$design$x-x_offset
@@ -562,7 +566,7 @@ server<-function(input, output,session){
       }
         don=bind_rows(design$design,I1$designI,I2$designI,I3$designI,replanting$design)
         
-        
+        # print(head(don))
       return(don)
       
     })

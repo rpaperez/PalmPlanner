@@ -35,13 +35,12 @@ paramFileName=paste0('DA1_Average_MAP_',MAP)
 
 ### test archimed rotation
 
-generate_design(dist_intra = 9,dist_inter = 9,dist_intercrop =NULL ,designType ='square_bis' ,orientation = 'NS',pointSize = 3,replanting = T)$plot
+# generate_design(dist_intra = 9,dist_inter = 9,dist_intercrop =NULL ,designType ='square_bis' ,orientation = 'NS',pointSize = 3,replanting = T,twist = 0)$plot
 
 ### check design
 # generate_design(dist_intra = dist_intra,dist_inter = dist_inter,dist_intercrop =dist_intercrop ,designType =designType ,orientation = orientation,pointSize = 3,replanting = T)$plot
 
-
-generate_design(dist_intra = 9,dist_inter = 9,dist_intercrop =NULL ,designType ='square' ,orientation = 'NS',pointSize = 3,replanting = T)$plot
+generate_design(dist_intra = 9,dist_inter = 9,dist_intercrop =NULL ,designType ='square' ,orientation = 'NS',pointSize = 3,replanting = T,twist = 0)$plot
 generate_design(dist_intra = 12,dist_inter =12,dist_intercrop =NULL ,designType ='square' ,orientation = 'NS',pointSize = 3,replanting = T)$plot
 
 ### run simu

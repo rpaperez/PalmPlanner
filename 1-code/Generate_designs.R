@@ -80,24 +80,7 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
     
   }
   
-  # ### test for estimating differences du to rotation in Archimed 
-  # if (designType %in% c('square_bis')){
-  #   if(!is.null(dist_intercrop)){
-  #     print('dist_intercrop is not considered in square design')
-  #     return(NULL)}
-  #   
-  #   x1=dist_inter/2
-  #   y1=dist_intra/2
-  #   xmax=x1+dist_inter/2
-  #   ymax=y1+dist_intra/2
-  #   
-  #   voronoi_plot=data.frame(x= y1,
-  #                           y= x1,
-  #                           xmin= 0,xmax=ymax,
-  #                           ymin= 0, ymax= xmax)
-  #   
-  # }
-  
+
   if (designType=='quincunx'){
     if(!is.null(dist_intercrop) | !is.na(dist_intercrop)){
       print('dist_intercrop is not considered in quincunx design')
@@ -115,24 +98,7 @@ generate_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,des
                            xmin= 0,xmax=xmax,
                            ymin= 0, ymax= ymax)
   }
-  
-  # if (designType=='quincunx_bis'){
-  #   if(!is.null(dist_intercrop)){
-  #     print('dist_intercrop is not considered in quincunx design')
-  #     return(NULL)}
-  #   
-  #   x1=dist_inter/2
-  #   y1=dist_intra/4
-  #   x2=dist_inter/2+dist_inter
-  #   y2=dist_intra/4+dist_intra/2
-  #   xmax=x2+dist_inter/2
-  #   ymax=y2+dist_intra/4
-  #   
-  #   voronoi_plot=data.frame(x= c(y1,y2),
-  #                           y= c(x1,x2),
-  #                           xmin= 0,xmax=ymax,
-  #                           ymin= 0, ymax= xmax)
-  # }
+ 
   
   if (designType=='quincunx2'){
     if(is.null(dist_intercrop)  | is.na(dist_intercrop)){
