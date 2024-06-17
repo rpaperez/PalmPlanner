@@ -126,6 +126,17 @@ ui<-shinyUI(
                             colourInput("colInt3", h4("Select colour"), "purple"),
                             
                    ),
+                   tabPanel("CropInLine1",
+                            textInput(inputId = "Int4",label =  h4("Enter the name of the crop"),value = 'Intercrop 4'),
+                            numericInput("intra_distC1",label = h4("Intra row distance (m):"), value=NULL,step = 0.1,min = 0),
+                            numericInput("offset_Y_C1",label = h4("y offset (m)"), value=0,step = 0.05,max = 0),
+                            
+                            tags$hr(),
+                            numericInput("pointSizeC1",label = h4("Select point size:"), value=10,step =0.2,min = 0),
+                            colourInput("colC1", h4("Select colour"), "blue")
+                            
+                   )
+                   ,
                    tabPanel("Replanting",
                             checkboxInput('replant',label = 'visualize old palms',value = F),
                             selectInput(inputId="designTypeR", label = h4("Select design pattern"),
@@ -137,9 +148,8 @@ ui<-shinyUI(
                             numericInput("offset_Y_R",label = h4("y offset (m)"), value=-4.5,step = 0.05,max = 0),
                             numericInput("offset_X_R",label = h4("x offset (m)"), value=-3.9,step = 0.05,max = 0),
                             numericInput("pointSizeR",label = h4("Select point size:"), value=5,step = 0.2,min = 0),
-                            
-                            
-                            
+                            colourInput("colR", h4("Select colour"), "grey"),
+            
                    )
                    
                  ),
@@ -197,12 +207,12 @@ server<-function(input, output,session){
     input$NbRemoved
   })
   
-  lim<- reactive({
-    input$lim
-  })
-  
   pointSize<- reactive({
     input$pointSize
+  })
+  
+  lim<- reactive({
+    input$lim
   })
   
   origin<- reactive({
@@ -234,6 +244,7 @@ server<-function(input, output,session){
     input$offset_Y_I1
   })
   
+
   
   ### intercrop2 parameters
   
@@ -286,6 +297,40 @@ server<-function(input, output,session){
     input$offset_Y_I3
   })
   
+  ##inner crop 1 parameters
+  inter_distC1<- reactive({
+    input$inter_distC1
+  })
+  
+  intra_distC1<- reactive({
+    input$intra_distC1
+  })
+  
+  dist_intercropC1<- reactive({
+    input$dist_intercropC1
+  })
+  
+  
+  designTypeC1<- reactive({
+    input$designTypeC1
+  })
+  
+  NbRemovedC1<- reactive({
+    input$NbRemovedC1
+  })
+  
+  pointSizeC1<- reactive({
+    input$pointSizeC1
+  })
+  
+  offset_Y_C1<- reactive({
+    input$offset_Y_C1
+  })
+  
+  Int4<- reactive({
+    input$Int4
+  })
+  
   ####replanting
   
   replant<- reactive({
@@ -331,6 +376,7 @@ server<-function(input, output,session){
         updateNumericInput(session, "dist_intercrop", value = 2*input$inter_dist)
       }
       
+      
       # inactivation of parameters if no intercorp 
       
       if(input$NbLines_I1==0){
@@ -350,7 +396,7 @@ server<-function(input, output,session){
       
       # inactivation of inter row distance for 1 row
       
-      if(  input$NbLines_I1==1 & !is.na(input$inter_dist_I1 | input$NbLines_I1==1 & is.na(input$inter_dist_I1))){
+      if(  input$NbLines_I1==1 & !is.na(input$inter_dist_I1) | input$NbLines_I1==1 & is.na(input$inter_dist_I1)){
     
         updateNumericInput(session, "inter_dist_I1", value = 0)
       }
@@ -402,15 +448,16 @@ server<-function(input, output,session){
     
     isolate({
       
-      d_inter=inter_dist()
-      d_intra=intra_dist()
+      dist_inter=inter_dist()
+      dist_intra=intra_dist()
       dist_intercrop=dist_intercrop()
-      orientation='NS'
       designType=designType()
       NbRemoved=NbRemoved()
-      lim=lim()
       pointSize=pointSize()
+      
       origin=origin()
+      lim=lim()
+      orientation='NS'
       
       inter_dist_I1=inter_dist_I1()
       intra_dist_I1=intra_dist_I1()
@@ -440,8 +487,15 @@ server<-function(input, output,session){
       offset_X_R=offset_X_R()
       replant=replant()
 
+
+      intra_distC1=intra_distC1()
+      designTypeC1=designTypeC1()
+      offset_Y_C1=offset_Y_C1()
+      NbRemovedC1=NbRemovedC1()
+      pointSizeC1=pointSizeC1()
+      Int4=Int4()
       
-      if (is.null(d_inter) | is.null(d_intra)) {
+      if (is.null(dist_inter) | is.null(dist_intra)) {
         return(NULL)
       }
       
@@ -450,12 +504,14 @@ server<-function(input, output,session){
       I1=NULL
       I2=NULL
       I3=NULL
+      C1=NULL
       replanting=NULL
       
       #### map
       designRef=tableDesign %>% filter(design==designType & NbR==NbRemoved) %>% select(designRef)
       print(paste('designRef=',designRef))
-      design=plot_design(dist_intra=d_intra,dist_inter=d_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSize,lim=lim)
+      
+      design=plot_design(dist_intra=dist_intra,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSize,lim=lim)
       
       if(origin==T){
         x_offset=design$design$x[1]
@@ -466,6 +522,7 @@ server<-function(input, output,session){
       
       design$design=design$design %>% 
         mutate(type='palms',
+               name='palms',
                Id=paste0(design$density,' palms.ha-1'),
                pointS=input$pointSize)
       
@@ -475,9 +532,9 @@ server<-function(input, output,session){
         
         designRef_I1=tableDesign %>% filter(design==designType_I1 & NbLines==NbLines_I1) %>% select(designRef)
         print(paste('designRef_I1=',designRef_I1))
-        print(paste(d_intra,d_inter,designRef[[1]],dist_intercrop,orientation,pointSize,lim,intra_dist_I1,inter_dist_I1,designRef_I1[[1]]))
+        print(paste(dist_intra,dist_inter,designRef[[1]],dist_intercrop,orientation,pointSize,lim,intra_dist_I1,inter_dist_I1,designRef_I1[[1]]))
         
-        I1=design_intercrop(dist_intra =d_intra,dist_inter =d_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I1,I_dist_inter =inter_dist_I1,I_designType = designRef_I1[[1]])
+        I1=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I1,I_dist_inter =inter_dist_I1,I_designType = designRef_I1[[1]])
         
         if(origin==T){
           # x_offset=I1$designPalm$x[1]
@@ -491,6 +548,7 @@ server<-function(input, output,session){
         I1$designI$y= I1$designI$y+offset_Y_I1
         I1$designI=I1$designI %>% 
           mutate(type='I1',
+                 name=Int1,
                  Id=paste0(I1$density,' ',Int1,'.ha-1'),
                  pointS=input$pointSizeInt1)
       }
@@ -498,7 +556,7 @@ server<-function(input, output,session){
       if ( NbLines_I2>0){
         designRef_I2=tableDesign %>% filter(design==designType_I2 & NbLines==NbLines_I2) %>% select(designRef)
         
-        I2=design_intercrop(dist_intra =d_intra,dist_inter =d_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I2,I_dist_inter =inter_dist_I2,I_designType = designRef_I2[[1]])
+        I2=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I2,I_dist_inter =inter_dist_I2,I_designType = designRef_I2[[1]])
         
         if(origin==T){
           # x_offset=I2$designPalm$x[1]
@@ -513,6 +571,7 @@ server<-function(input, output,session){
         I2$designI$y= I2$designI$y+offset_Y_I2
         I2$designI= I2$designI%>% 
           mutate(type='I2',
+                 name=Int2,
                  Id=paste0(I2$density,' ',Int2,'.ha-1'),
                  pointS=input$pointSizeInt2)
       }
@@ -522,7 +581,7 @@ server<-function(input, output,session){
         designRef_I3=tableDesign %>% filter(design==designType_I3 & NbLines==NbLines_I3) %>% select(designRef)
         
         
-        I3=design_intercrop(dist_intra =d_intra,dist_inter =d_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I3,I_dist_inter =inter_dist_I3,I_designType = designRef_I3[[1]])
+        I3=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I3,I_dist_inter =inter_dist_I3,I_designType = designRef_I3[[1]])
         
         if(origin==T){
           # x_offset=I3$designPalm$x[1]
@@ -538,9 +597,30 @@ server<-function(input, output,session){
         
         I3$designI= I3$designI %>% 
           mutate(type='I3',
+                 name=Int3,
                  Id=paste0(I3$density,' ',Int3,'.ha-1'),
                  pointS=input$pointSizeInt3)
         
+      }
+      
+      ### CropInLine 1
+      if (!is.na(intra_distC1)){
+
+      C1=plot_design(dist_intra=intra_distC1,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSizeC1,lim=2*lim)
+
+      if(origin==T){
+        C1$design$x=C1$design$x-x_offset
+        C1$design$y=C1$design$y-y_offset
+      }
+
+      C1$design$y= C1$design$y+offset_Y_C1
+
+      C1$design=C1$design %>%
+        mutate(type='C1',
+               name=Int4,
+               Id=paste0(C1$density,' ',Int4,'.ha-1'),
+               pointS=input$pointSizeC1)
+
       }
       
       #### add old planting#####
@@ -561,10 +641,11 @@ server<-function(input, output,session){
         
         replanting$design=replanting$design %>% 
           mutate(type='old palms',
+                 name='old palms',
                  Id=paste0(replanting$density,' old palms.ha-1'),
                  pointS=input$pointSize)
       }
-        don=bind_rows(design$design,I1$designI,I2$designI,I3$designI,replanting$design)
+        don=bind_rows(design$design,I1$designI,I2$designI,I3$designI,replanting$design,C1$design)
         
         # print(head(don))
       return(don)
@@ -572,6 +653,10 @@ server<-function(input, output,session){
     })
   })
   
+  
+
+# remove points -----------------------------------------------------------
+
   
   observeEvent(input$delete,{
     sub=df() %>% filter(!(x %in% selectP()$x & y %in% selectP()$y))
@@ -607,18 +692,19 @@ server<-function(input, output,session){
     } 
     
     
-    tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3,'grey')
+    tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3,input$colC1,input$colR)
     
     names(tableColor)=c(unique(df[df$type=='palms','Id']),
                         unique(df[df$type=='I1','Id']),
                         unique(df[df$type=='I2','Id']),
                         unique(df[df$type=='I3','Id']),
+                        unique(df[df$type=='C1','Id']),
                         unique(df[df$type=='old palms','Id']))
     
-    tableShape=c(8,1,15,18,4) 
+    tableShape=c(8,1,15,18,16,4) 
     names(tableShape)=names(tableColor)
     
-    tableSize=c(input$pointSize,input$pointSizeInt1,input$pointSizeInt2,input$pointSizeInt3,input$pointSizeR)
+    tableSize=c(input$pointSize,input$pointSizeInt1,input$pointSizeInt2,input$pointSizeInt3,input$pointSizeC1,input$pointSizeR)
     
     names(tableSize)=names(tableColor)
 
@@ -650,7 +736,12 @@ server<-function(input, output,session){
   })
   
   output$table<- renderTable({
-    selectP()[,c('x','y')]
+    sub=df() %>%
+      filter((x %in% selectP()$x & y %in% selectP()$y)) %>%
+      dplyr::select(x,y,name)
+    return(sub)
+    # selectP()[,c('x','y')]
+    
   })
   
 }

@@ -116,15 +116,32 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
       return(NULL)
     }
     
-    x1=dist_inter/2
+    # x1=dist_inter/2
+    # y1=dist_intra/4
+    # x2=dist_inter/2+dist_intercrop
+    # y2=dist_intra/4+dist_intra/2
+    # xmax=dist_inter+dist_intercrop
+    # ymax=dist_intra
+    
+    # voronoi_plot= data.frame(x= c(x1,x2),
+    #                          y= c(y1,y2),
+    #                          xmin= 0,xmax=xmax,
+    #                          ymin= 0, ymax= ymax)
+    
+    x1=dist_intercrop/2
     y1=dist_intra/4
-    x2=dist_inter/2+dist_intercrop
-    y2=dist_intra/4+dist_intra/2
-    xmax=dist_inter+dist_intercrop
+    x2=x1+dist_inter
+    y2=y1+dist_intra/2
+    x3=x2+dist_intercrop
+    y3=y2
+    x4=x3+dist_inter
+    y4=y1
+      
+    xmax=2*dist_intercrop+2*dist_inter
     ymax=dist_intra
     
-    voronoi_plot= data.frame(x= c(x1,x2),
-                             y= c(y1,y2),
+    voronoi_plot= data.frame(x= c(x1,x2,x3,x4),
+                             y= c(y1,y2,y3,y4),
                              xmin= 0,xmax=xmax,
                              ymin= 0, ymax= ymax)
     
@@ -200,19 +217,44 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
       print('please provide dist_intercrop in quincunx4 design')
       return(NULL)}
     
-    x1=dist_inter/2
+    # x1=dist_inter/2
+    # y1=dist_intra/4
+    # x2=x1+dist_inter
+    # y2=y1+dist_intra/2
+    # x3=x2+dist_intercrop
+    # y3=y1
+    # x4=x3+dist_inter
+    # y4=y2
+    # xmax=x4+dist_inter/2
+    # ymax=y4+dist_intra/4
+    # 
+    # voronoi_plot= data.frame(x= c(x1,x2,x3,x4),
+    #                          y= c(y1,y2,y3,y4),
+    #                          xmin= 0, xmax= xmax,
+    #                          ymin= 0, ymax= ymax)
+    
+    x1=dist_intercrop/2
     y1=dist_intra/4
     x2=x1+dist_inter
     y2=y1+dist_intra/2
-    x3=x2+dist_intercrop
+    x3=x2+dist_inter
     y3=y1
     x4=x3+dist_inter
     y4=y2
-    xmax=x4+dist_inter/2
-    ymax=y4+dist_intra/4
+    x5=x4+dist_intercrop
+    y5=y2
+    x6=x5+dist_inter
+    y6=y1
+    x7=x6+dist_inter
+    y7=y2
+    x8=x7+dist_inter
+    y8=y1
     
-    voronoi_plot= data.frame(x= c(x1,x2,x3,x4),
-                             y= c(y1,y2,y3,y4),
+    xmax=x8+dist_intercrop/2
+    ymax=y7+dist_intra/4
+
+    voronoi_plot= data.frame(x= c(x1,x2,x3,x4,x5,x6,x7,x8),
+                             y= c(y1,y2,y3,y4,y5,y6,y7,y8),
                              xmin= 0, xmax= xmax,
                              ymin= 0, ymax= ymax)
     
@@ -293,11 +335,10 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
     
   }
   
-  # number of raow and columns in 1 ha
+  # number of rows and columns in 1 ha
   repRows=ceiling(lim/(dist_inter+dist_intercrop))
   repCol=ceiling(lim/dist_intra)
   
-  # number of raow and columns in 1 ha
   
   
   # Matrix of the design (each cell is a Voronoi):
@@ -374,7 +415,8 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
 
 
 sizeDesign=data.frame(designType=c('square','quincunx','square2','quincunx2','square3','quincunx3','square4','quincunx4','square5','quincunx5'),
-                      nLines=c(1,1,2,2,3,3,4,4,5,5)) %>% 
+                      nLines=c(1,1,2,2,3,3,4,4,5,5),
+                      firstLines=c(1,1,2,4,3,3,4,8,5,5)) %>% 
   mutate(interLines=nLines-1)
 
 #' design_intercrop generate an intercrop design
@@ -398,7 +440,7 @@ design_intercrop=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,de
   
   ### get distance between intercrop edge and palms row
   dist_edge=(dist_intercrop-sizeDesign[sizeDesign==I_designType,]$interLines*I_dist_inter)/2
-  
+
   if(designType %in% c('square','quincunx')){
     dist_intercrop=0
     dist_edge=(dist_inter-sizeDesign[sizeDesign==I_designType,]$interLines*I_dist_inter)/2
@@ -407,6 +449,7 @@ design_intercrop=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,de
     }
   }
   
+  print(paste('dist edge=',dist_edge))
   # print(dist_edge)
   if((dist_edge)<0){
     print('!!! intercroping area is larger than intercropping space between palm rows')
@@ -432,10 +475,11 @@ design_intercrop=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,de
   b=plot_design(dist_intra=I_dist_intra,dist_inter=I_dist_inter,dist_intercrop=D_intercrops,designType=I_designType,orientation=orientation,pointSize=pointSize,lim=2*lim) 
   
   ### keep full intercropping area (remove first rows)
-  I_removeL=min(2,sizeDesign[sizeDesign$designType==I_designType,]$nLines-1) ### lines to remove
+  I_removeL=min(2,sizeDesign[sizeDesign$designType==I_designType,]$firstLines-1) ### lines to remove
   I_start=ifelse(I_removeL>0,unique(b$design$x)[I_removeL],0)
   
-  offSetL=max(1,min(2,sizeDesign[sizeDesign$designType==designType,]$nLines-1)) ### first lines  in palm design to get the offset of intercropping area
+  offSetL=max(1,min(2,sizeDesign[sizeDesign$designType==designType,]$firstLines-1)) ### first lines  in palm design to get the offset of intercropping area
+  print(paste('offSetL=',offSetL))
   
   interCrop=  b$design %>% 
     filter(x>I_start) %>% 
