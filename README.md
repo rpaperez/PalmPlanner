@@ -6,6 +6,7 @@ R.PEREZ (June 2024)
 -   [Description](#description)
 -   [Installation](#install)
 -   [Usage](#usage)
+-   [Notes](#notes)
 
 
 ## Description {#description}
@@ -34,7 +35,7 @@ Additionally, the colourpicker package is required and will be installed from Gi
 
 ## Usage {#usage}
 
-On the right, you'll find 5 tab sets where you can modify the parameters for each crop. The first tab, ``PALMS`` contains arguments for designing the oil palm planting pattern. The other tabs, ``INTERCROP1``, ``INTERCROP2`` and ``INTERCROP3`` are for the intercrops and the last tab ``REPLANTING`` is for representing an old planting.
+On the right, you'll find 5 tab sets where you can modify the parameters for each crop. The first tab, ``PALMS`` contains arguments for designing the oil palm planting pattern. The ``INTERCROP1``, ``INTERCROP2`` and ``INTERCROP3`` are for the intercrops,``CROP IN PALM ROW`` is for crops in rows of palm trees, ``REPLANTING`` is for representing an old planting, and ``REPLACE PALM`` is for replacing deleted palms in the design with an intercrop.
 
 ### Oil palm arguments
 
@@ -57,6 +58,7 @@ In the ``PALMS`` tab, you can modify the following arguments:
 
 ### Intercrops arguments
 
+##### Intercrop between rows of palms 
 In each ``INTERCROP`` tab, you can modify the following arguments:
 
 ``Enter the name of the intercrop``: Enter the name of the intercrop, that will update names in plot legend.
@@ -74,6 +76,16 @@ In each ``INTERCROP`` tab, you can modify the following arguments:
 ``Select point size`` : size of point in the plot
 
 ``Select colour`` : colour of  point in the plot.
+
+
+##### Intercrop in rows of palms
+In ``CROP IN PALM ROW`` tab, crops will be placed on every rows of palms. Only the distance between crop in rows can be adpated
+
+``Intra row distance (m)``: distance within rows of the intercrop
+
+The ``REPLACE PALM`` tab can be used once palms are deleted in the design. The button ``REPLACE DELETED PALMS`` will replaced the former deleted palms with the new crop 
+
+
 
 ### Replanting  arguments
 
@@ -107,6 +119,8 @@ Additional plot arguments include:
 
 ``DELETED SELECTED POINTS``: button to delete the points selected when clicking on the plot, or selected with the lasso tool. The selected points are listed in the ``SELECTION`` tab. To unselect points, double click and/or use the lasso on empty region of the plot.
 
-``RESET DATA``: button to return to the original plot before removing points.
 
+## Notes {#notes}
+Densities are determined by the initial densities, which vary based on the number of rows and the distances between and within each crop. Plants that are removed or replaced are not included in the density calculations.
 
+If a mis-click occurs while removing or replacing points, only a reset of the app will restore all the points.

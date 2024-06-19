@@ -126,16 +126,28 @@ ui<-shinyUI(
                             colourInput("colInt3", h4("Select colour"), "purple"),
                             
                    ),
-                   tabPanel("CropInLine1",
+                   tabPanel("Crop in palm row",
                             textInput(inputId = "Int4",label =  h4("Enter the name of the crop"),value = 'Intercrop 4'),
                             numericInput("intra_distC1",label = h4("Intra row distance (m):"), value=NULL,step = 0.1,min = 0),
                             numericInput("offset_Y_C1",label = h4("y offset (m)"), value=0,step = 0.05,max = 0),
                             
                             tags$hr(),
-                            numericInput("pointSizeC1",label = h4("Select point size:"), value=10,step =0.2,min = 0),
+                            numericInput("pointSizeC1",label = h4("Select point size:"), value=2,step =0.2,min = 0),
                             colourInput("colC1", h4("Select colour"), "blue")
                             
                    )
+                   
+                   ,
+                   
+                   tabPanel("replace Palm",
+                            textInput(inputId = "Replace",label =  h4("Enter the name of the crop"),value = 'Intercrop 5'),
+                            tags$hr(),
+                            numericInput("pointSizeReplace",label = h4("Select point size:"), value=2,step =0.2,min = 0),
+                            colourInput("colReplace", h4("Select colour"), "brown"),
+                            actionButton('replace', 'Replace deleted palms')
+                            
+                   )
+                   
                    ,
                    tabPanel("Replanting",
                             checkboxInput('replant',label = 'visualize old palms',value = F),
@@ -149,9 +161,8 @@ ui<-shinyUI(
                             numericInput("offset_X_R",label = h4("x offset (m)"), value=-3.9,step = 0.05,max = 0),
                             numericInput("pointSizeR",label = h4("Select point size:"), value=5,step = 0.2,min = 0),
                             colourInput("colR", h4("Select colour"), "grey"),
-            
+                            
                    )
-                   
                  ),
                  tags$hr(),
                  tags$hr(),
@@ -163,11 +174,12 @@ ui<-shinyUI(
                    
                    tabPanel('plot',
                             actionButton('delete', 'Delete selected points'), 
-                            actionButton('ResetData', 'Reset data'),
                             plotlyOutput('plot')%>% withSpinner(color="darkorange")
-                   
+                            
                    ),
                    tabPanel('Selection',
+                            # actionButton('ResetData', 'Reset data'),
+                            # checkboxInput('selectReset',label = 'Select the table to reset',value = T),
                             tableOutput('table')
                    )
                  )
@@ -244,7 +256,7 @@ server<-function(input, output,session){
     input$offset_Y_I1
   })
   
-
+  
   
   ### intercrop2 parameters
   
@@ -357,10 +369,11 @@ server<-function(input, output,session){
     input$offset_X_R
   })
   
-
+  
   
   sub=NULL
   df=reactiveVal()
+  selection=reactiveVal() 
   
   ## condition
   
@@ -397,7 +410,7 @@ server<-function(input, output,session){
       # inactivation of inter row distance for 1 row
       
       if(  input$NbLines_I1==1 & !is.na(input$inter_dist_I1) | input$NbLines_I1==1 & is.na(input$inter_dist_I1)){
-    
+        
         updateNumericInput(session, "inter_dist_I1", value = 0)
       }
       if(  input$NbLines_I1==1 & is.na(input$intra_dist_I1) | input$NbLines_I1==1 & input$intra_dist_I1==0){   updateNumericInput(session, "intra_dist_I1", value = 5)
@@ -486,8 +499,8 @@ server<-function(input, output,session){
       offset_Y_R=offset_Y_R()
       offset_X_R=offset_X_R()
       replant=replant()
-
-
+      
+      
       intra_distC1=intra_distC1()
       designTypeC1=designTypeC1()
       offset_Y_C1=offset_Y_C1()
@@ -605,22 +618,22 @@ server<-function(input, output,session){
       
       ### CropInLine 1
       if (!is.na(intra_distC1)){
-
-      C1=plot_design(dist_intra=intra_distC1,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSizeC1,lim=2*lim)
-
-      if(origin==T){
-        C1$design$x=C1$design$x-x_offset
-        C1$design$y=C1$design$y-y_offset
-      }
-
-      C1$design$y= C1$design$y+offset_Y_C1
-
-      C1$design=C1$design %>%
-        mutate(type='C1',
-               name=Int4,
-               Id=paste0(C1$density,' ',Int4,'.ha-1'),
-               pointS=input$pointSizeC1)
-
+        
+        C1=plot_design(dist_intra=intra_distC1,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSizeC1,lim=2*lim)
+        
+        if(origin==T){
+          C1$design$x=C1$design$x-x_offset
+          C1$design$y=C1$design$y-y_offset
+        }
+        
+        C1$design$y= C1$design$y+offset_Y_C1
+        
+        C1$design=C1$design %>%
+          mutate(type='C1',
+                 name=Int4,
+                 Id=paste0(C1$density,' ',Int4,'.ha-1'),
+                 pointS=input$pointSizeC1)
+        
       }
       
       #### add old planting#####
@@ -645,43 +658,91 @@ server<-function(input, output,session){
                  Id=paste0(replanting$density,' old palms.ha-1'),
                  pointS=input$pointSize)
       }
-        don=bind_rows(design$design,I1$designI,I2$designI,I3$designI,replanting$design,C1$design)
-        
-        # print(head(don))
+      don=bind_rows(design$design,I1$designI,I2$designI,I3$designI,replanting$design,C1$design) %>% 
+        mutate(code=paste(x,y,name))
+      
+      # print(head(don))
       return(don)
       
     })
   })
   
   
-
-# remove points -----------------------------------------------------------
-
   
-  observeEvent(input$delete,{
-    sub=df() %>% filter(!(x %in% selectP()$x & y %in% selectP()$y))
-    df(sub)
-    
-  })
-  
-  observeEvent(input$ResetData, {
-    df(result())
-  })
+  # remove points -----------------------------------------------------------
   
   observeEvent(input$action, {
     df(result())
   })
   
+  
   selectP <- reactive({
     d <- event_data("plotly_click")
     l <- event_data("plotly_selected")
-    
     rbind(d,l) 
   })
   
+  values <- reactiveValues()
+  
+  values$df <- data.frame(x = NA, y = NA,name=NA)
+  
+  newEntry <- reactive({
+    
+    repl_sub=df() %>% filter((x %in% selectP()$x & y %in% selectP()$y))
+    newLine <- c(repl_sub$x, repl_sub$y,repl_sub$name)
+    isolate({newEntry=values$df <- rbind(values$df, newLine)  })
+    newEntry=newEntry%>% 
+      filter(name %in% c('old palms','palms',input$Int1,input$Int2,input$Int3,input$Int4)) %>% 
+      mutate(xy=paste(x,y),
+             code=paste(x,y,name),
+             codeP=paste(x,y,'palms'))
+    ### remove selected points of intercrops overlapping palm points
+    newEntry=newEntry%>% 
+      mutate(overlap=ifelse(codeP %in% unique(newEntry$code) & !(name %in% c('palms')),T,F)) %>% 
+      filter(overlap==F)
+    
+    return(newEntry)
+  })
+  
+  observeEvent(input$delete,{
+    sub=result() %>% filter(!(code %in% paste(newEntry()$x,newEntry()$y,newEntry()$name)))
+    df(sub)
+    
+  })
+  
+  
+  # replace palms points -----------------------------------------------------------
+  
+  observeEvent(input$replace,{
+    replaceP=newEntry() %>%
+      filter(name=='palms') 
+    
+    subPrev=df() %>% 
+      mutate(xy=paste(x,y)) %>% 
+      filter(!(xy %in% unique(replaceP$xy))) %>% 
+      select(type,x,y,Id)
+    
+    subRepl=result() %>% 
+      mutate(xy=paste(x,y)) %>% 
+      filter(xy %in% unique(replaceP$xy)) %>% 
+      mutate(type='replacement',
+             name=input$Replace,
+             Id=input$Replace,
+             pointS=input$pointSizeR) %>% 
+      select(type,x,y,Id)
+    
+    
+    # print(paste(colnames(result())))
+    
+    df(rbind(subPrev,subRepl))
+    
+  })
+  
+  
+  
   #### graphic####
   plot<-reactive({
-
+    
     cond<- cond()
     lim=lim()
     result=result()
@@ -692,23 +753,24 @@ server<-function(input, output,session){
     } 
     
     
-    tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3,input$colC1,input$colR)
+    tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3,input$colC1,input$colReplace,input$colR)
     
     names(tableColor)=c(unique(df[df$type=='palms','Id']),
                         unique(df[df$type=='I1','Id']),
                         unique(df[df$type=='I2','Id']),
                         unique(df[df$type=='I3','Id']),
                         unique(df[df$type=='C1','Id']),
+                        unique(df[df$type=='replacement','Id']),
                         unique(df[df$type=='old palms','Id']))
     
-    tableShape=c(8,1,15,18,16,4) 
+    tableShape=c(8,1,15,18,16,5,4)
     names(tableShape)=names(tableColor)
     
-    tableSize=c(input$pointSize,input$pointSizeInt1,input$pointSizeInt2,input$pointSizeInt3,input$pointSizeC1,input$pointSizeR)
+    tableSize=c(input$pointSize,input$pointSizeInt1,input$pointSizeInt2,input$pointSizeInt3,input$pointSizeC1,input$pointSizeReplace,input$pointSizeR)
     
     names(tableSize)=names(tableColor)
-
-      gr=ggplot(data=df,aes(x=x,y=y,col= Id,pch=Id,size=Id))+
+    
+    gr=ggplot(data=df,aes(x=x,y=y,col= Id,pch=Id,size=Id))+
       geom_point()+
       xlim(c(-1,lim))+
       ylim(c(-1,lim))+
@@ -716,7 +778,7 @@ server<-function(input, output,session){
       scale_color_manual(name='',values = tableColor)+
       scale_shape_manual(name='',values=tableShape)+
       scale_size_manual(name='',values=tableSize)+
-        
+      
       coord_equal()+
       myTheme
     
@@ -736,12 +798,12 @@ server<-function(input, output,session){
   })
   
   output$table<- renderTable({
-    sub=df() %>%
-      filter((x %in% selectP()$x & y %in% selectP()$y)) %>%
-      dplyr::select(x,y,name)
-    return(sub)
-    # selectP()[,c('x','y')]
-    
+    # sub=df() %>%
+    #   filter((x %in% selectP()$x & y %in% selectP()$y)) %>%
+    #   dplyr::select(x,y,name)
+    # return(sub)
+    newEntry() %>% 
+      select(x,y,name)
   })
   
 }

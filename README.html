@@ -359,6 +359,7 @@ display: none;
 <li><a href="#description">Description</a></li>
 <li><a href="#install">Installation</a></li>
 <li><a href="#usage">Usage</a></li>
+<li><a href="#notes">Notes</a></li>
 </ul>
 <div id="description" class="section level2">
 <h2>Description</h2>
@@ -397,10 +398,13 @@ times to install all the packages.</p>
 <h2>Usage</h2>
 <p>On the right, you’ll find 5 tab sets where you can modify the
 parameters for each crop. The first tab, <code>PALMS</code> contains
-arguments for designing the oil palm planting pattern. The other tabs,
+arguments for designing the oil palm planting pattern. The
 <code>INTERCROP1</code>, <code>INTERCROP2</code> and
-<code>INTERCROP3</code> are for the intercrops and the last tab
-<code>REPLANTING</code> is for representing an old planting.</p>
+<code>INTERCROP3</code> are for the
+intercrops,<code>CROP IN PALM ROW</code> is for crops in rows of palm
+trees, <code>REPLANTING</code> is for representing an old planting, and
+<code>REPLACE PALM</code> is for replacing deleted palms in the design
+with an intercrop.</p>
 <div id="oil-palm-arguments" class="section level3">
 <h3>Oil palm arguments</h3>
 <p>In the <code>PALMS</code> tab, you can modify the following
@@ -423,6 +427,8 @@ distance</p>
 </div>
 <div id="intercrops-arguments" class="section level3">
 <h3>Intercrops arguments</h3>
+<div id="intercrop-between-rows-of-palms" class="section level5">
+<h5>Intercrop between rows of palms</h5>
 <p>In each <code>INTERCROP</code> tab, you can modify the following
 arguments:</p>
 <p><code>Enter the name of the intercrop</code>: Enter the name of the
@@ -441,6 +447,17 @@ between oil palms and intercrops. The value is negative to change
 intercrops point down in the plot.</p>
 <p><code>Select point size</code> : size of point in the plot</p>
 <p><code>Select colour</code> : colour of point in the plot.</p>
+</div>
+<div id="intercrop-in-rows-of-palms" class="section level5">
+<h5>Intercrop in rows of palms</h5>
+<p>In <code>CROP IN PALM ROW</code> tab, crops will be placed on every
+rows of palms. Only the distance between crop in rows can be adpated</p>
+<p><code>Intra row distance (m)</code>: distance within rows of the
+intercrop</p>
+<p>The <code>REPLACE PALM</code> tab can be used once palms are deleted
+in the design. The button <code>REPLACE DELETED PALMS</code> will
+replaced the former deleted palms with the new crop</p>
+</div>
 </div>
 <div id="replanting-arguments" class="section level3">
 <h3>Replanting arguments</h3>
@@ -475,9 +492,16 @@ selected when clicking on the plot, or selected with the lasso tool. The
 selected points are listed in the <code>SELECTION</code> tab. To
 unselect points, double click and/or use the lasso on empty region of
 the plot.</p>
-<p><code>RESET DATA</code>: button to return to the original plot before
-removing points.</p>
 </div>
+</div>
+<div id="notes" class="section level2">
+<h2>Notes</h2>
+<p>Densities are determined by the initial densities, which vary based
+on the number of rows and the distances between and within each crop.
+Plants that are removed or replaced are not included in the density
+calculations.</p>
+<p>If a mis-click occurs while removing or replacing points, only a
+reset of the app will restore all the points.</p>
 </div>
 </div>
 
