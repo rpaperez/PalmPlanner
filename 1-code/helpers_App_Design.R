@@ -237,11 +237,11 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
     y1=dist_intra/4
     x2=x1+dist_inter
     y2=y1+dist_intra/2
-    x3=x2+dist_inter
-    y3=y1
+    x3=x2+dist_intercrop
+    y3=y2
     x4=x3+dist_inter
-    y4=y2
-    x5=x4+dist_intercrop
+    y4=y1
+    x5=x4+dist_inter
     y5=y2
     x6=x5+dist_inter
     y6=y1
@@ -476,10 +476,12 @@ design_intercrop=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,de
   
   ### keep full intercropping area (remove first rows)
   I_removeL=min(2,sizeDesign[sizeDesign$designType==I_designType,]$firstLines-1) ### lines to remove
+  # print(paste('I_remove====',I_removeL))
   I_start=ifelse(I_removeL>0,unique(b$design$x)[I_removeL],0)
+  # print(paste('I_start====',I_start))
   
   offSetL=max(1,min(2,sizeDesign[sizeDesign$designType==designType,]$firstLines-1)) ### first lines  in palm design to get the offset of intercropping area
-  print(paste('offSetL=',offSetL))
+  # print(paste('offSetL=',offSetL))
   
   interCrop=  b$design %>% 
     filter(x>I_start) %>% 
@@ -784,31 +786,31 @@ RunSimu=function(paramFileName=paramFileName,d_inter=d_inter,d_intra=d_intra,d_i
 
 # test --------------------------------------------------------------------
 
-
-
-dist_intercrop=10
-dist_intra=5
-dist_inter=10
-designType='quincunx3'
-I_dist_intra=5
-I_dist_inter=10
-I_designType='quincunx'
-lim=50
-orientation='NS'
-pointSize=3
-#
-#
-I1=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designType,dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = I_dist_intra,I_dist_inter =I_dist_inter,I_designType = I_designType)
-#
-I2=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designType,dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = 2,I_dist_inter =1,I_designType = 'square3')
-
-
-ggplot()+
-  geom_point(data=I1$designPalm,aes(x=x,y=y,col= 'palms'),shape=8,size=pointSize)+
-  geom_point(data=I1$designI,aes(x=x,y=y,col='intercrop1'),size=pointSize-1,alpha=0.8)+
-  geom_point(data=I2$designI,aes(x=x,y=y,col='intercrop2'),size=pointSize-1,pch=17,alpha=0.8)+
-  xlim(c(0,lim))+
-  ylim(c(0,lim))
+# 
+# 
+# dist_intercrop=10
+# dist_intra=5
+# dist_inter=10
+# designType='quincunx3'
+# I_dist_intra=5
+# I_dist_inter=10
+# I_designType='quincunx'
+# lim=50
+# orientation='NS'
+# pointSize=3
+# #
+# #
+# I1=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designType,dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = I_dist_intra,I_dist_inter =I_dist_inter,I_designType = I_designType)
+# #
+# I2=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designType,dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = 2,I_dist_inter =1,I_designType = 'square3')
+# 
+# 
+# ggplot()+
+#   geom_point(data=I1$designPalm,aes(x=x,y=y,col= 'palms'),shape=8,size=pointSize)+
+#   geom_point(data=I1$designI,aes(x=x,y=y,col='intercrop1'),size=pointSize-1,alpha=0.8)+
+#   geom_point(data=I2$designI,aes(x=x,y=y,col='intercrop2'),size=pointSize-1,pch=17,alpha=0.8)+
+#   xlim(c(0,lim))+
+#   ylim(c(0,lim))
 
 
 # test=plot_design(dist_intra = 2,dist_inter = 4,dist_intercrop = 6,designType = 'square4',orientation = 'NS',pointSize = 2,lim = 50)

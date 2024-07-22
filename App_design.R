@@ -731,8 +731,7 @@ server<-function(input, output,session){
              pointS=input$pointSizeR) %>% 
       select(type,x,y,Id)
     
-    
-    # print(paste(colnames(result())))
+
     
     df(rbind(subPrev,subRepl))
     
@@ -755,6 +754,28 @@ server<-function(input, output,session){
     
     tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3,input$colC1,input$colReplace,input$colR)
     
+    ## calculate density after removing plants
+    df_sub=df %>% filter(x<=lim) %>% filter(y<=lim)
+    
+    density_palms=paste(nrow(df_sub[df_sub$type=='palms',])/(max(df_sub[df_sub$type=='I1',]$x)/100*max(df_sub[df_sub$type=='I1',]$y)/100),'palms.ha-1')
+    density_I1=paste(nrow(df_sub[df_sub$type=='I1',])/(max(df_sub[df_sub$type=='I1',]$x)/100*max(df_sub[df_sub$type=='I1',]$y)/100),input$Int1,'.ha-1')
+    density_I2=paste(nrow(df_sub[df_sub$type=='I2',])/(max(df_sub[df_sub$type=='I2',]$x)/100*max(df_sub[df_sub$type=='I2',]$y)/100),input$Int2,'.ha-1')
+    density_I3=paste(nrow(df_sub[df_sub$type=='I3',])/(max(df_sub[df_sub$type=='I3',]$x)/100*max(df_sub[df_sub$type=='I3',]$y)/100),input$Int3,'.ha-1')
+    density_C1=paste(nrow(df_sub[df_sub$type=='C1',])/(max(df_sub[df_sub$type=='C1',]$x)/100*max(df_sub[df_sub$type=='C1',]$y)/100),input$Int4,'.ha-1')
+    density_replacement=paste(nrow(df_sub[df_sub$type=='replacement',])/(max(df_sub[df_sub$type=='replacement',]$x)/100*max(df_sub[df_sub$type=='replacement',]$y)/100),input$Replace,'.ha-1')
+    density_old=paste(nrow(df_sub[df_sub$type=='old palms',])/(max(df_sub[df_sub$type=='old palms',]$x)/100*max(df_sub[df_sub$type=='old palms',]$y)/100),'old palms.ha-1')
+    
+    
+   
+    df[df$type=='palms','Id']=density_palms
+    df[df$type=='I1','Id']=density_I1
+    df[df$type=='I2','Id']=density_I2
+    df[df$type=='I3','Id']=density_I3
+    df[df$type=='C1','Id']=density_C1
+    df[df$type=='replacement','Id']=density_replacement
+    df[df$type=='old palms','Id']=density_old
+    
+
     names(tableColor)=c(unique(df[df$type=='palms','Id']),
                         unique(df[df$type=='I1','Id']),
                         unique(df[df$type=='I2','Id']),
@@ -762,6 +783,8 @@ server<-function(input, output,session){
                         unique(df[df$type=='C1','Id']),
                         unique(df[df$type=='replacement','Id']),
                         unique(df[df$type=='old palms','Id']))
+    
+    
     
     tableShape=c(8,1,15,18,16,5,4)
     names(tableShape)=names(tableColor)
