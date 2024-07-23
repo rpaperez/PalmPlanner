@@ -233,7 +233,7 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
     #                          xmin= 0, xmax= xmax,
     #                          ymin= 0, ymax= ymax)
     
-    x1=dist_intercrop/2
+    x1=dist_inter/2
     y1=dist_intra/4
     x2=x1+dist_inter
     y2=y1+dist_intra/2
@@ -245,13 +245,13 @@ plot_design=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,designT
     y5=y2
     x6=x5+dist_inter
     y6=y1
-    x7=x6+dist_inter
-    y7=y2
+    x7=x6+dist_intercrop
+    y7=y1
     x8=x7+dist_inter
-    y8=y1
+    y8=y2
     
-    xmax=x8+dist_intercrop/2
-    ymax=y7+dist_intra/4
+    xmax=x8+dist_inter/2
+    ymax=y8+dist_intra/4
 
     voronoi_plot= data.frame(x= c(x1,x2,x3,x4,x5,x6,x7,x8),
                              y= c(y1,y2,y3,y4,y5,y6,y7,y8),
@@ -449,7 +449,7 @@ design_intercrop=function(dist_intra=NULL,dist_inter=NULL,dist_intercrop=NULL,de
     }
   }
   
-  print(paste('dist edge=',dist_edge))
+  # print(paste('dist edge=',dist_edge))
   # print(dist_edge)
   if((dist_edge)<0){
     print('!!! intercroping area is larger than intercropping space between palm rows')

@@ -56,7 +56,7 @@ ui<-shinyUI(
                             
                             tags$hr(),
                             numericInput("pointSize",label = h4("Select point size:"), value=10,step =0.2,min = 0),
-                            colourInput("colPalm", h4("Select colour"), "forestgreen")
+                            colourpicker::colourInput("colPalm", h4("Select colour"), "forestgreen")
                             
                    )
                    ,
@@ -79,7 +79,7 @@ ui<-shinyUI(
                             numericInput("offset_Y_I1",label = h4("y offset (m)"), value=0,step = 0.05,max=0),
                             tags$hr(),
                             numericInput("pointSizeInt1",label = h4("Select point size:"), value=2,step = 0.2,min = 0),
-                            colourInput("colInt1", h4("Select colour"), "orange"),
+                            colourpicker::colourInput("colInt1", h4("Select colour"), "orange"),
                             
                    ),
                    tabPanel("Intercrop2",
@@ -101,7 +101,7 @@ ui<-shinyUI(
                             numericInput("offset_Y_I2",label = h4("y offset (m)"), value=0,step = 0.05,max = 0),
                             tags$hr(),
                             numericInput("pointSizeInt2",label = h4("Select point size:"), value=2,step = 0.2,min = 0),
-                            colourInput("colInt2", h4("Select colour"), "red"),
+                            colourpicker::colourInput("colInt2", h4("Select colour"), "red"),
                             
                    ),
                    tabPanel("Intercrop3",
@@ -123,7 +123,7 @@ ui<-shinyUI(
                             numericInput("offset_Y_I3",label = h4("y offset (m)"), value=0,step = 0.05,max = 0),
                             tags$hr(),
                             numericInput("pointSizeInt3",label = h4("Select point size:"), value=2,step = 0.2,min = 0),
-                            colourInput("colInt3", h4("Select colour"), "purple"),
+                            colourpicker::colourInput("colInt3", h4("Select colour"), "purple"),
                             
                    ),
                    tabPanel("Crop in palm row",
@@ -133,7 +133,7 @@ ui<-shinyUI(
                             
                             tags$hr(),
                             numericInput("pointSizeC1",label = h4("Select point size:"), value=2,step =0.2,min = 0),
-                            colourInput("colC1", h4("Select colour"), "blue")
+                            colourpicker::colourInput("colC1", h4("Select colour"), "blue")
                             
                    )
                    
@@ -143,7 +143,7 @@ ui<-shinyUI(
                             textInput(inputId = "Replace",label =  h4("Enter the name of the crop"),value = 'Intercrop 5'),
                             tags$hr(),
                             numericInput("pointSizeReplace",label = h4("Select point size:"), value=2,step =0.2,min = 0),
-                            colourInput("colReplace", h4("Select colour"), "brown"),
+                            colourpicker::colourInput("colReplace", h4("Select colour"), "brown"),
                             actionButton('replace', 'Replace deleted palms')
                             
                    )
@@ -160,14 +160,14 @@ ui<-shinyUI(
                             numericInput("offset_Y_R",label = h4("y offset (m)"), value=-4.5,step = 0.05,max = 0),
                             numericInput("offset_X_R",label = h4("x offset (m)"), value=-3.9,step = 0.05,max = 0),
                             numericInput("pointSizeR",label = h4("Select point size:"), value=5,step = 0.2,min = 0),
-                            colourInput("colR", h4("Select colour"), "grey"),
+                            colourpicker::colourInput("colR", h4("Select colour"), "grey"),
                             
                    )
                  ),
                  tags$hr(),
                  tags$hr(),
-                 numericInput("lim",label = h4("plot limits (m):"), value=50,step = 10,min = 0),
-                 checkboxInput('origin',label = 'Set origin to the first palm',value = T)
+                 numericInput("lim",label = h4("plot limits (m):"), value=100,step = 10,min = 0),
+                 checkboxInput('origin',label = 'Set origin to the first palm',value = F)
                ),
                mainPanel(
                  tabsetPanel(
@@ -178,7 +178,7 @@ ui<-shinyUI(
                             
                    ),
                    tabPanel('Selection',
-                            # actionButton('ResetData', 'Reset data'),
+                            # actionButton('reset', 'Reset data'),
                             # checkboxInput('selectReset',label = 'Select the table to reset',value = T),
                             tableOutput('table')
                    )
@@ -209,6 +209,7 @@ server<-function(input, output,session){
   dist_intercrop<- reactive({
     input$dist_intercrop
   })
+  
   
   
   designType<- reactive({
@@ -519,10 +520,12 @@ server<-function(input, output,session){
       I3=NULL
       C1=NULL
       replanting=NULL
+      x_offset=0
+      y_offset=0
       
       #### map
       designRef=tableDesign %>% filter(design==designType & NbR==NbRemoved) %>% select(designRef)
-      print(paste('designRef=',designRef))
+      # print(paste('designRef=',designRef))
       
       design=plot_design(dist_intra=dist_intra,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSize,lim=lim)
       
@@ -544,8 +547,6 @@ server<-function(input, output,session){
       if ( NbLines_I1>0){
         
         designRef_I1=tableDesign %>% filter(design==designType_I1 & NbLines==NbLines_I1) %>% select(designRef)
-        print(paste('designRef_I1=',designRef_I1))
-        print(paste(dist_intra,dist_inter,designRef[[1]],dist_intercrop,orientation,pointSize,lim,intra_dist_I1,inter_dist_I1,designRef_I1[[1]]))
         
         I1=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I1,I_dist_inter =inter_dist_I1,I_designType = designRef_I1[[1]])
         
@@ -661,8 +662,9 @@ server<-function(input, output,session){
       don=bind_rows(design$design,I1$designI,I2$designI,I3$designI,replanting$design,C1$design) %>% 
         mutate(code=paste(x,y,name))
       
+      result=list(don=don,offsets=data.frame(x_offset=x_offset,y_offset=y_offset))
       # print(head(don))
-      return(don)
+      return(result)
       
     })
   })
@@ -672,7 +674,7 @@ server<-function(input, output,session){
   # remove points -----------------------------------------------------------
   
   observeEvent(input$action, {
-    df(result())
+    df(result()$don)
   })
   
   
@@ -705,7 +707,7 @@ server<-function(input, output,session){
   })
   
   observeEvent(input$delete,{
-    sub=result() %>% filter(!(code %in% paste(newEntry()$x,newEntry()$y,newEntry()$name)))
+    sub=result()$don %>% filter(!(code %in% paste(newEntry()$x,newEntry()$y,newEntry()$name)))
     df(sub)
     
   })
@@ -720,18 +722,18 @@ server<-function(input, output,session){
     subPrev=df() %>% 
       mutate(xy=paste(x,y)) %>% 
       filter(!(xy %in% unique(replaceP$xy))) %>% 
-      select(type,x,y,Id)
+      select(type,x,y,Id,xmax,ymax,repCol,repRows)
     
-    subRepl=result() %>% 
+    subRepl=result()$don %>% 
       mutate(xy=paste(x,y)) %>% 
       filter(xy %in% unique(replaceP$xy)) %>% 
       mutate(type='replacement',
              name=input$Replace,
              Id=input$Replace,
              pointS=input$pointSizeR) %>% 
-      select(type,x,y,Id)
+      select(type,x,y,Id,xmax,ymax,repCol,repRows)
     
-
+    
     
     df(rbind(subPrev,subRepl))
     
@@ -744,29 +746,55 @@ server<-function(input, output,session){
     
     cond<- cond()
     lim=lim()
-    result=result()
+    # result=result()
     
     df<- df()
     if (is.null(df)){
-      df(result())
+      df(result()$don)
     } 
     
     
     tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3,input$colC1,input$colReplace,input$colR)
     
-    ## calculate density after removing plants
-    df_sub=df %>% filter(x<=lim) %>% filter(y<=lim)
-    
-    density_palms=paste(nrow(df_sub[df_sub$type=='palms',])/(max(df_sub[df_sub$type=='I1',]$x)/100*max(df_sub[df_sub$type=='I1',]$y)/100),'palms.ha-1')
-    density_I1=paste(nrow(df_sub[df_sub$type=='I1',])/(max(df_sub[df_sub$type=='I1',]$x)/100*max(df_sub[df_sub$type=='I1',]$y)/100),input$Int1,'.ha-1')
-    density_I2=paste(nrow(df_sub[df_sub$type=='I2',])/(max(df_sub[df_sub$type=='I2',]$x)/100*max(df_sub[df_sub$type=='I2',]$y)/100),input$Int2,'.ha-1')
-    density_I3=paste(nrow(df_sub[df_sub$type=='I3',])/(max(df_sub[df_sub$type=='I3',]$x)/100*max(df_sub[df_sub$type=='I3',]$y)/100),input$Int3,'.ha-1')
-    density_C1=paste(nrow(df_sub[df_sub$type=='C1',])/(max(df_sub[df_sub$type=='C1',]$x)/100*max(df_sub[df_sub$type=='C1',]$y)/100),input$Int4,'.ha-1')
-    density_replacement=paste(nrow(df_sub[df_sub$type=='replacement',])/(max(df_sub[df_sub$type=='replacement',]$x)/100*max(df_sub[df_sub$type=='replacement',]$y)/100),input$Replace,'.ha-1')
-    density_old=paste(nrow(df_sub[df_sub$type=='old palms',])/(max(df_sub[df_sub$type=='old palms',]$x)/100*max(df_sub[df_sub$type=='old palms',]$y)/100),'old palms.ha-1')
+    ## calculate density after removing plants (removing also offsets for a propoer estimation of density)
+    x_offset=result()$offsets$x_offset
+    y_offset=result()$offsets$y_offset
     
     
+    # get voronoi limits (in m)
+    xmax_unit=(max(df$xmax))/(max(df$repCol))
+    ymax_unit=(max(df$ymax))/(max(df$repRows))
+    
+    # number of voronoi replicated in lim
+    repX=(lim+x_offset)%/%xmax_unit
+    repY=(lim+y_offset)%/%ymax_unit
+    
+    limX=repX*xmax_unit
+    limY=repY*ymax_unit
+    
+    ### removing offsets
+    
+    df_sub=df %>% mutate(x=x+x_offset,y=y+y_offset) 
    
+    
+    df_sub[df_sub$type=='old palms',]$x=df_sub[df_sub$type=='old palms',]$x-offset_X_R()
+    df_sub[df_sub$type=='old palms',]$y=df_sub[df_sub$type=='old palms',]$y-offset_Y_R()
+    df_sub[df_sub$type=='I1',]$y=df_sub[df_sub$type=='I1',]$y+offset_Y_I1()
+    df_sub[df_sub$type=='I2',]$y=df_sub[df_sub$type=='I2',]$y+offset_Y_I2()
+    df_sub[df_sub$type=='I3',]$y=df_sub[df_sub$type=='I3',]$y+offset_Y_I3()
+    df_sub[df_sub$type=='C1',]$y=df_sub[df_sub$type=='C1',]$y+offset_Y_C1()
+    
+
+    df_sub=df_sub%>%  filter(x<=limX & y<=limY)
+    density_palms=paste(floor(nrow(df_sub[df_sub$type=='palms',])/((limX/100)*(limY/100))),'palms.ha-1')
+    density_I1=paste(floor(nrow(df_sub[df_sub$type=='I1',])/((limX/100)*(limY/100))),input$Int1,'.ha-1')
+    density_I2=paste(floor(nrow(df_sub[df_sub$type=='I2',])/((limX/100)*(limY/100))),input$Int2,'.ha-1')
+    density_I3=paste(floor(nrow(df_sub[df_sub$type=='I3',])/((limX/100)*(limY/100))),input$Int3,'.ha-1')
+    density_C1=paste(floor(nrow(df_sub[df_sub$type=='C1',])/((limX/100)*(limY/100))),input$Int4,'.ha-1')
+    density_replacement=paste(floor(nrow(df_sub[df_sub$type=='replacement',])/((limX/100)*(limY/100))),input$Replace,'.ha-1')
+    density_old=paste(floor(nrow(df_sub[df_sub$type=='old palms',])/((limX/100)*(limY/100))),'old palms.ha-1')
+    
+    
     df[df$type=='palms','Id']=density_palms
     df[df$type=='I1','Id']=density_I1
     df[df$type=='I2','Id']=density_I2
@@ -775,7 +803,7 @@ server<-function(input, output,session){
     df[df$type=='replacement','Id']=density_replacement
     df[df$type=='old palms','Id']=density_old
     
-
+    
     names(tableColor)=c(unique(df[df$type=='palms','Id']),
                         unique(df[df$type=='I1','Id']),
                         unique(df[df$type=='I2','Id']),
