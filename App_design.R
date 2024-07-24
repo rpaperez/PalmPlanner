@@ -178,7 +178,7 @@ ui<-shinyUI(
                             
                    ),
                    tabPanel('Selection',
-                            # actionButton('reset', 'Reset data'),
+                            actionButton('reset', 'Reset data'),
                             # checkboxInput('selectReset',label = 'Select the table to reset',value = T),
                             tableOutput('table')
                    )
@@ -375,7 +375,6 @@ server<-function(input, output,session){
   sub=NULL
   df=reactiveVal()
   selection=reactiveVal() 
-  
   ## condition
   
   cond<- reactive({
@@ -677,41 +676,50 @@ server<-function(input, output,session){
     df(result()$don)
   })
   
-  
   selectP <- reactive({
-    d <- event_data("plotly_click")
-    l <- event_data("plotly_selected")
-    rbind(d,l) 
+    d <- event_data("plotly_click",source='A')
+    l <- event_data("plotly_selected",source='A')
+  
+    selectP=rbind(d,l) 
+    return(selectP)
   })
   
   values <- reactiveValues()
-  
   values$df <- data.frame(x = NA, y = NA,name=NA)
   
   newEntry <- reactive({
     
     repl_sub=df() %>% filter((x %in% selectP()$x & y %in% selectP()$y))
-    newLine <- c(repl_sub$x, repl_sub$y,repl_sub$name)
-    isolate({newEntry=values$df <- rbind(values$df, newLine)  })
+    
+    newLine <- data.frame(x=repl_sub$x, y=repl_sub$y,name=repl_sub$name)
+    isolate({newEntry=values$df <- rbind(values$df,newLine)  
     newEntry=newEntry%>% 
       filter(name %in% c('old palms','palms',input$Int1,input$Int2,input$Int3,input$Int4)) %>% 
       mutate(xy=paste(x,y),
              code=paste(x,y,name),
-             codeP=paste(x,y,'palms'))
+             codeP=paste(x,y,'palms')) %>% 
+      distinct()
     ### remove selected points of intercrops overlapping palm points
     newEntry=newEntry%>% 
       mutate(overlap=ifelse(codeP %in% unique(newEntry$code) & !(name %in% c('palms')),T,F)) %>% 
-      filter(overlap==F)
-    
+      filter(overlap==F)})
     return(newEntry)
   })
   
   observeEvent(input$delete,{
-    sub=result()$don %>% filter(!(code %in% paste(newEntry()$x,newEntry()$y,newEntry()$name)))
+    # sub=result()$don %>% filter(!(code %in% paste(newEntry()$x,newEntry()$y,newEntry()$name)))
+    sub=result()$don %>% filter(!(code %in% paste(selection()$x,selection()$y,selection()$name)))
     df(sub)
     
   })
   
+  # reset selection --------------------------------------------------------
+  
+  observeEvent(input$reset,{
+    values$df <- data.frame(x = NA, y = NA,name=NA)
+    selection(NULL)
+    df(result()$don)
+  })  
   
   # replace palms points -----------------------------------------------------------
   
@@ -722,7 +730,7 @@ server<-function(input, output,session){
     subPrev=df() %>% 
       mutate(xy=paste(x,y)) %>% 
       filter(!(xy %in% unique(replaceP$xy))) %>% 
-      select(type,x,y,Id,xmax,ymax,repCol,repRows)
+      select(type,x,y,Id,xmax,ymax,repCol,repRows,name)
     
     subRepl=result()$don %>% 
       mutate(xy=paste(x,y)) %>% 
@@ -731,9 +739,7 @@ server<-function(input, output,session){
              name=input$Replace,
              Id=input$Replace,
              pointS=input$pointSizeR) %>% 
-      select(type,x,y,Id,xmax,ymax,repCol,repRows)
-    
-    
+      select(type,x,y,Id,xmax,ymax,repCol,repRows,name)
     
     df(rbind(subPrev,subRepl))
     
@@ -750,9 +756,12 @@ server<-function(input, output,session){
     
     df<- df()
     if (is.null(df)){
-      df(result()$don)
+      # df(result()$don)
+      return(NULL)
     } 
     
+    print(summary(df()))
+    selection(newEntry() %>% select(x,y,name) )
     
     tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3,input$colC1,input$colReplace,input$colR)
     
@@ -775,8 +784,6 @@ server<-function(input, output,session){
     ### removing offsets
     
     df_sub=df %>% mutate(x=x+x_offset,y=y+y_offset) 
-   
-    
     df_sub[df_sub$type=='old palms',]$x=df_sub[df_sub$type=='old palms',]$x-offset_X_R()
     df_sub[df_sub$type=='old palms',]$y=df_sub[df_sub$type=='old palms',]$y-offset_Y_R()
     df_sub[df_sub$type=='I1',]$y=df_sub[df_sub$type=='I1',]$y+offset_Y_I1()
@@ -784,8 +791,10 @@ server<-function(input, output,session){
     df_sub[df_sub$type=='I3',]$y=df_sub[df_sub$type=='I3',]$y+offset_Y_I3()
     df_sub[df_sub$type=='C1',]$y=df_sub[df_sub$type=='C1',]$y+offset_Y_C1()
     
-
+    
     df_sub=df_sub%>%  filter(x<=limX & y<=limY)
+    
+    
     density_palms=paste(floor(nrow(df_sub[df_sub$type=='palms',])/((limX/100)*(limY/100))),'palms.ha-1')
     density_I1=paste(floor(nrow(df_sub[df_sub$type=='I1',])/((limX/100)*(limY/100))),input$Int1,'.ha-1')
     density_I2=paste(floor(nrow(df_sub[df_sub$type=='I2',])/((limX/100)*(limY/100))),input$Int2,'.ha-1')
@@ -793,8 +802,7 @@ server<-function(input, output,session){
     density_C1=paste(floor(nrow(df_sub[df_sub$type=='C1',])/((limX/100)*(limY/100))),input$Int4,'.ha-1')
     density_replacement=paste(floor(nrow(df_sub[df_sub$type=='replacement',])/((limX/100)*(limY/100))),input$Replace,'.ha-1')
     density_old=paste(floor(nrow(df_sub[df_sub$type=='old palms',])/((limX/100)*(limY/100))),'old palms.ha-1')
-    
-    
+
     df[df$type=='palms','Id']=density_palms
     df[df$type=='I1','Id']=density_I1
     df[df$type=='I2','Id']=density_I2
@@ -833,7 +841,7 @@ server<-function(input, output,session){
       coord_equal()+
       myTheme
     
-    gr=ggplotly(gr,height = 800,width=800,source = "A")
+    gr=ggplotly(gr,height = 800,width=800,source='A') %>% layout(dragmode = "lasso")
     return(gr)
     
   })
@@ -842,7 +850,6 @@ server<-function(input, output,session){
   
   ### plot
   output$plot=renderPlotly({plot()})
-  
   
   output$ui.action <- renderUI({
     actionButton("action", "Visualize the design")
@@ -853,8 +860,9 @@ server<-function(input, output,session){
     #   filter((x %in% selectP()$x & y %in% selectP()$y)) %>%
     #   dplyr::select(x,y,name)
     # return(sub)
-    newEntry() %>% 
-      select(x,y,name)
+    # newEntry() %>% 
+    #   select(x,y,name)
+    selection()
   })
   
 }

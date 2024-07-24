@@ -106,7 +106,6 @@ In the ``REPLANTING`` tab, you can modify the following arguments:
 ``Select point size`` : size of point in the plot
 
 
-
 ### Plot arguments
 
 Additional plot arguments include:
@@ -117,10 +116,9 @@ Additional plot arguments include:
 
 ``Visalize the design``: button to update the design based on the entered arguments.
 
-``DELETED SELECTED POINTS``: button to delete the points selected when clicking on the plot, or selected with the lasso tool. The selected points are listed in the ``SELECTION`` tab. To unselect points, double click and/or use the lasso on empty region of the plot.
+``DELETED SELECTED POINTS``: button to delete the points selected when clicking on the plot, or selected with the lasso tool. The selected points are listed in the ``SELECTION`` tab. You can remove all the point selected by clicking on the ``RESET DATA`` button. It is possible that you need to reset twice for deleting all the point. Also you need to unselect the last points saved by double clicking and/or using the lasso on empty region of the plot. 
 
 
 ## Notes {#notes}
-Densities are determined by the initial densities, which vary based on the number of rows and the distances between and within each crop. Plants that are removed or replaced are not included in the density calculations.
-
+The desity should be update when you remove plants. If not you may reset of the app.
 If a mis-click occurs while removing or replacing points, only a reset of the app will restore all the points.
