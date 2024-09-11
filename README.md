@@ -116,7 +116,8 @@ Additional plot arguments include:
 
 ``Visalize the design``: button to update the design based on the entered arguments.
 
-``DELETED SELECTED POINTS``: button to delete the points selected when clicking on the plot, or selected with the lasso tool. The selected points are listed in the ``SELECTION`` tab. You can remove all the point selected by clicking on the ``RESET DATA`` button. It is possible that you need to reset twice for deleting all the point. Also you need to unselect the last points saved by double clicking and/or using the lasso on empty region of the plot. 
+``DELETED SELECTED POINTS``: button to delete the points selected when clicking on the plot, or selected with the lasso/box tool. The selected points are listed in the ``SELECTION`` tab. You can remove all the point selected by clicking on the ``RESET DATA`` button. It is possible that you need to reset twice for deleting all the point. Also you need to unselect the last points saved by double clicking and/or using the lasso on empty region of the plot.
+NB: Removed points at the end when all the oil plam and intercrops have been designed. You can select only the points of a particular species by double-clicking on the legend.
 
 
 ## Notes {#notes}

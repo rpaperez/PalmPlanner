@@ -689,10 +689,18 @@ server<-function(input, output,session){
   
   newEntry <- reactive({
     
-    repl_sub=df() %>% filter((x %in% selectP()$x & y %in% selectP()$y))
+
+    repl_sub=df() %>% 
+      mutate(xy=paste(x,y)) %>% 
+      filter((xy %in% paste(selectP()$x,selectP()$y))) %>% 
+      select(-xy)
+    
+
     
     newLine <- data.frame(x=repl_sub$x, y=repl_sub$y,name=repl_sub$name)
+    
     isolate({newEntry=values$df <- rbind(values$df,newLine)  
+    
     newEntry=newEntry%>% 
       filter(name %in% c('old palms','palms',input$Int1,input$Int2,input$Int3,input$Int4)) %>% 
       mutate(xy=paste(x,y),
@@ -760,7 +768,7 @@ server<-function(input, output,session){
       return(NULL)
     } 
     
-    print(summary(df()))
+    # print(summary(df()))
     selection(newEntry() %>% select(x,y,name) )
     
     tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3,input$colC1,input$colReplace,input$colR)
@@ -856,12 +864,6 @@ server<-function(input, output,session){
   })
   
   output$table<- renderTable({
-    # sub=df() %>%
-    #   filter((x %in% selectP()$x & y %in% selectP()$y)) %>%
-    #   dplyr::select(x,y,name)
-    # return(sub)
-    # newEntry() %>% 
-    #   select(x,y,name)
     selection()
   })
   
