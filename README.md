@@ -15,7 +15,6 @@ This Shiny app allows users to represent intercropping designs through different
 
 ## Installation {#install}
 To run this app, ensure you have installed R and R studio software (https://posit.co/).
-Then open the file Optipalmex_R.Rproj with RStudio. This will help R locate all the necessary data on your computer to run the code.
 
 Once RStudio is open, launch the file App_design.R. The code will appear in the RStudio console; click on the "Run App" button in the top right corner of the console window.
 
@@ -33,6 +32,7 @@ Additionally, the colourpicker package is required and will be installed from Gi
 ## Usage {#usage}
 
 On the left, you'll find 5 tab sets where you can modify the parameters for each crop. The first tab, ``PALMS`` contains arguments for designing the oil palm planting pattern. The ``INTERCROP1``, ``INTERCROP2`` and ``INTERCROP3`` are for the intercrops,``CROP IN PALM ROW`` is for crops in rows of palm trees, ``REPLANTING`` is for representing an old planting, and ``REPLACE PALM`` is for replacing deleted palms in the design with an intercrop.
+
 
 ### Oil palm arguments
 
@@ -117,6 +117,6 @@ Additional plot arguments include:
 
 
 ## Notes {#notes}
-- The density should be update when you remove plants. If not you may reset of the app.
+- The density will be updated when you remove plants.
 - You can click on legend to remove one species for the visualization. A double-click allows the visualization of one species
-- It is easier to remove points at the end when all the oil plam and intercrops have been designed. You can select only the points of a particular species by double-clicking on the legend.
+- It is easier to remove points at the end when all the oil palm and intercrops have been designed. You can select only the points of a particular species by double-clicking on the legend.

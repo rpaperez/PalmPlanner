@@ -1,4 +1,4 @@
----
+
 title: 'PalmPlanner: A R-Shiny application for designing and visualizing spatial arrangement of oil palm-based agroforestry systems'
 tags:
   - R
@@ -37,7 +37,7 @@ affiliations:
    
 year: 2024
 bibliography: paper.bib
----
+
 
 # Summary
 
@@ -63,7 +63,7 @@ All specific interactive procedures are detailed in the README.md provided on th
 
 # Use-case
 
-![Summary in Easy16S and three examples of data visualization](screenshot/image.png)
+![Figure 1](images/screenApp.png)
 
 # Perspective
 
