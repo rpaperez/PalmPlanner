@@ -1,5 +1,5 @@
 # Load packages -----------------------------------------------------------
-packs <- c('shiny','shinythemes','shinycssloaders',"lubridate", "stringr", 'tidyverse','viridis','plotly','devtools')
+packs <- c('shiny','shinythemes','shinycssloaders','tidyverse','plotly','devtools')
 InstIfNec<-function (pack) {
   if (!do.call(require,as.list(pack))) {
     do.call(install.packages,as.list(pack))  }
@@ -9,6 +9,9 @@ lapply(packs, InstIfNec)
 if (!do.call(require,list('colourpicker'))) {
   devtools::install_github("daattali/colourpicker")
 }
+
+
+# inputs ------------------------------------------------------------------
 
 myTheme=theme_minimal() %+replace% 
   theme( 
@@ -26,10 +29,11 @@ tableDesign=data.frame(designRef=c('square','quincunx',"square2",'quincunx2',"sq
                        NbR=c('0','0',"1/3","1/3","1/4","1/4","1/5","1/5","1/6","1/6"),
                        NbLines=c(1,1,2,2,3,3,4,4,5,5))
 
+
+# UI ----------------------------------------------------------------------
+
+
 ui<-shinyUI(
-  # fluidPage(
-  
-  # titlePanel("Simulate light transmission"),
   navbarPage(theme = shinytheme("sandstone"),
              title ="Designing oil palm based intercropping systems",
              
@@ -179,7 +183,6 @@ ui<-shinyUI(
                    ),
                    tabPanel('Selection',
                             actionButton('reset', 'Reset data'),
-                            # checkboxInput('selectReset',label = 'Select the table to reset',value = T),
                             tableOutput('table')
                    )
                  )
@@ -191,13 +194,14 @@ ui<-shinyUI(
 
 
 
+# SERVER ------------------------------------------------------------------
 
 server<-function(input, output,session){
   
   source('./1-code/helpers_App_Design.R')
   
   
-  ##plam parameters
+  ##palm parameters
   inter_dist<- reactive({
     input$inter_dist
   })
@@ -344,7 +348,7 @@ server<-function(input, output,session){
     input$Int4
   })
   
-  ####replanting
+  ####replanting parameters
   
   replant<- reactive({
     input$replant
@@ -375,8 +379,8 @@ server<-function(input, output,session){
   sub=NULL
   df=reactiveVal()
   selection=reactiveVal() 
-  ## condition
   
+  ## conditions on inputs selection
   cond<- reactive({
     
     observe({
@@ -390,7 +394,7 @@ server<-function(input, output,session){
       }
       
       
-      # inactivation of parameters if no intercorp 
+      # inactivation of parameters if there is no intercrop 
       
       if(input$NbLines_I1==0){
         updateNumericInput(session, "inter_dist_I1", value = NA)
@@ -430,7 +434,7 @@ server<-function(input, output,session){
         updateNumericInput(session, "intra_dist_I3", value = 7)
       }
       
-      ## avoid inter row null when multiple row design is selected
+      ## initialize inter row distance when multiple row design is selected
       
       if(  input$NbLines_I1>1 & is.na(input$inter_dist_I1) | input$NbLines_I1>1 & !is.na(input$inter_dist_I1) & input$inter_dist_I1==0){
         updateNumericInput(session, "inter_dist_I1", value = 3)
@@ -512,7 +516,7 @@ server<-function(input, output,session){
         return(NULL)
       }
       
-      ###init
+      ###initialization
       
       I1=NULL
       I2=NULL
@@ -522,9 +526,8 @@ server<-function(input, output,session){
       x_offset=0
       y_offset=0
       
-      #### map
+      #### create the design
       designRef=tableDesign %>% filter(design==designType & NbR==NbRemoved) %>% select(designRef)
-      # print(paste('designRef=',designRef))
       
       design=plot_design(dist_intra=dist_intra,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSize,lim=lim)
       
@@ -550,8 +553,6 @@ server<-function(input, output,session){
         I1=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I1,I_dist_inter =inter_dist_I1,I_designType = designRef_I1[[1]])
         
         if(origin==T){
-          # x_offset=I1$designPalm$x[1]
-          # y_offset=I1$designPalm$y[1]
           I1$designPalm$x=I1$designPalm$x-x_offset
           I1$designPalm$y=I1$designPalm$y-y_offset
           I1$designI$x=I1$designI$x-x_offset
@@ -572,8 +573,6 @@ server<-function(input, output,session){
         I2=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I2,I_dist_inter =inter_dist_I2,I_designType = designRef_I2[[1]])
         
         if(origin==T){
-          # x_offset=I2$designPalm$x[1]
-          # y_offset=I2$designPalm$y[1]
           
           I2$designPalm$x=I2$designPalm$x-x_offset
           I2$designPalm$y=I2$designPalm$y-y_offset
@@ -597,8 +596,6 @@ server<-function(input, output,session){
         I3=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I3,I_dist_inter =inter_dist_I3,I_designType = designRef_I3[[1]])
         
         if(origin==T){
-          # x_offset=I3$designPalm$x[1]
-          # y_offset=I3$designPalm$y[1]
           
           I3$designPalm$x=I3$designPalm$x-x_offset
           I3$designPalm$y=I3$designPalm$y-y_offset
@@ -636,7 +633,7 @@ server<-function(input, output,session){
         
       }
       
-      #### add old planting#####
+      #### add old palms positions when replanting is selected
       if (replant==T){
         
         designRefRep=tableDesign %>% filter(design==designTypeR & NbR==0) %>% select(designRef)
@@ -662,7 +659,6 @@ server<-function(input, output,session){
         mutate(code=paste(x,y,name))
       
       result=list(don=don,offsets=data.frame(x_offset=x_offset,y_offset=y_offset))
-      # print(head(don))
       return(result)
       
     })
@@ -670,7 +666,7 @@ server<-function(input, output,session){
   
   
   
-  # remove points -----------------------------------------------------------
+  # remove points manually -----------------------------------------------------------
   
   observeEvent(input$action, {
     df(result()$don)
@@ -694,9 +690,7 @@ server<-function(input, output,session){
       mutate(xy=paste(x,y)) %>% 
       filter((xy %in% paste(selectP()$x,selectP()$y))) %>% 
       select(-xy)
-    
 
-    
     newLine <- data.frame(x=repl_sub$x, y=repl_sub$y,name=repl_sub$name)
     
     isolate({newEntry=values$df <- rbind(values$df,newLine)  
@@ -707,6 +701,7 @@ server<-function(input, output,session){
              code=paste(x,y,name),
              codeP=paste(x,y,'palms')) %>% 
       distinct()
+    
     ### remove selected points of intercrops overlapping palm points
     newEntry=newEntry%>% 
       mutate(overlap=ifelse(codeP %in% unique(newEntry$code) & !(name %in% c('palms')),T,F)) %>% 
@@ -715,13 +710,12 @@ server<-function(input, output,session){
   })
   
   observeEvent(input$delete,{
-    # sub=result()$don %>% filter(!(code %in% paste(newEntry()$x,newEntry()$y,newEntry()$name)))
     sub=result()$don %>% filter(!(code %in% paste(selection()$x,selection()$y,selection()$name)))
     df(sub)
     
   })
   
-  # reset selection --------------------------------------------------------
+  # reset selected points --------------------------------------------------------
   
   observeEvent(input$reset,{
     values$df <- data.frame(x = NA, y = NA,name=NA)
@@ -760,20 +754,17 @@ server<-function(input, output,session){
     
     cond<- cond()
     lim=lim()
-    # result=result()
-    
+
     df<- df()
     if (is.null(df)){
-      # df(result()$don)
       return(NULL)
     } 
     
-    # print(summary(df()))
     selection(newEntry() %>% select(x,y,name) )
     
     tableColor=c(input$colPalm,input$colInt1,input$colInt2,input$colInt3,input$colC1,input$colReplace,input$colR)
     
-    ## calculate density after removing plants (removing also offsets for a propoer estimation of density)
+    ## calculate density after removing plants (removing also offsets for a proper estimation of density)
     x_offset=result()$offsets$x_offset
     y_offset=result()$offsets$y_offset
     
@@ -863,6 +854,7 @@ server<-function(input, output,session){
     actionButton("action", "Visualize the design")
   })
   
+  ### table of selected points for deletion
   output$table<- renderTable({
     selection()
   })

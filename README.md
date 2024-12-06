@@ -35,7 +35,7 @@ Additionally, the colourpicker package is required and will be installed from Gi
 
 ## Usage {#usage}
 
-On the right, you'll find 5 tab sets where you can modify the parameters for each crop. The first tab, ``PALMS`` contains arguments for designing the oil palm planting pattern. The ``INTERCROP1``, ``INTERCROP2`` and ``INTERCROP3`` are for the intercrops,``CROP IN PALM ROW`` is for crops in rows of palm trees, ``REPLANTING`` is for representing an old planting, and ``REPLACE PALM`` is for replacing deleted palms in the design with an intercrop.
+On the left, you'll find 5 tab sets where you can modify the parameters for each crop. The first tab, ``PALMS`` contains arguments for designing the oil palm planting pattern. The ``INTERCROP1``, ``INTERCROP2`` and ``INTERCROP3`` are for the intercrops,``CROP IN PALM ROW`` is for crops in rows of palm trees, ``REPLANTING`` is for representing an old planting, and ``REPLACE PALM`` is for replacing deleted palms in the design with an intercrop.
 
 ### Oil palm arguments
 
@@ -116,10 +116,10 @@ Additional plot arguments include:
 
 ``Visalize the design``: button to update the design based on the entered arguments.
 
-``DELETED SELECTED POINTS``: button to delete the points selected when clicking on the plot, or selected with the lasso/box tool. The selected points are listed in the ``SELECTION`` tab. You can remove all the point selected by clicking on the ``RESET DATA`` button. It is possible that you need to reset twice for deleting all the point. Also you need to unselect the last points saved by double clicking and/or using the lasso on empty region of the plot.
-NB: Removed points at the end when all the oil plam and intercrops have been designed. You can select only the points of a particular species by double-clicking on the legend.
+``DELETED SELECTED POINTS``: button to delete the points selected when clicking on the plot, or selected with the lasso/box tool. The selected points are listed in the ``SELECTION`` tab. You can remove all the point selected by clicking on the ``RESET DATA`` button. It is possible that you need to reset twice for deleting all the point. Also you need to unselect the last points saved by double clicking and/or using the lasso on empty region of the plot.If a mis-click occurs while removing or replacing points, only a reset of the app will restore all the points.
 
 
 ## Notes {#notes}
-The desity should be update when you remove plants. If not you may reset of the app.
-If a mis-click occurs while removing or replacing points, only a reset of the app will restore all the points.
+- The density should be update when you remove plants. If not you may reset of the app.
+- You can click on legend to remove one species for the visualization. A double-click allows the visualization of one species
+- It is easier to remove points at the end when all the oil plam and intercrops have been designed. You can select only the points of a particular species by double-clicking on the legend.
