@@ -1,0 +1,21 @@
+{
+    "debugBreakpointsState": {
+        "breakpoints": [
+            {
+                "id": 3,
+                "path": "~/Documents/Optipalmex/Optipalmex_R/1-code/helpers_App_Design.R",
+                "line_number": 440,
+                "function_steps": "",
+                "function_name": "plot_intercrop",
+                "state": 2,
+                "editor_state": 2,
+                "editor_line_number": 440,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": true,
+                "type": 0,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            }
+        ]
+    }
+}
