@@ -1,5 +1,5 @@
 ---
-title: 'PalmPlanner: A R-Shiny application for designing and visualizing spatial arrangement of oil palm-based agroforestry systems'
+title:'PalmPlanner: A R-Shiny application for designing and visualizing spatial arrangement of oil palm-based agroforestry systems'
 tags:
   - R
   - R Shiny
@@ -14,27 +14,27 @@ authors:
     orcid: 0000-0001-5267-1189
     affiliation: "3, 4"
   - name: Axel Labeyrie
-    orcid: 
+    orcid:
     affiliation: 5
   - name: Laurène Feintrenie
     orcid: 0000-0003-1621-396X
     affiliation: "6, 7"
 affiliations:
- - name: CIRAD, UMR AGAP Institut, F-34398 Montpellier, France
+ - name: CIRAD, UMR AGAP Institut, F34398 Montpellier, France
    index: 1
  - name: UMR AGAP Institut, Univ Montpellier, CIRAD, INRAE, Institut Agro, Montpellier, France
    index: 2
- - name: CIRAD, UMR Innovation, 34398 Montpellier, France 
+ - name: CIRAD, UMR Innovation, 34398 Montpellier, France
    index: 3
-- name:  INNOVATION, Univ. Montpellier, CIRAD, INRAE, Institut Agro, Montpellier, France  
+ - name:  INNOVATION, Univ. Montpellier, CIRAD, INRAE, Institut Agro, Montpellier, France
    index: 4
-- name:  Afilliation Axel  
-   index: 5 
-- name:  afil. TETIS
+ - name:  Afilliation Axel
+   index: 5
+ - name: TETIS
    index: 6
-- name:  afil. ECOSUR
+ - name:   ECOSUR
    index: 7
-   
+
 year: 2024
 bibliography: paper.bib
 
