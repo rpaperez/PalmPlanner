@@ -474,7 +474,6 @@ server<-function(input, output,session){
       
       origin=origin()
       lim=lim()
-      orientation='NS'
       
       inter_dist_I1=inter_dist_I1()
       intra_dist_I1=intra_dist_I1()
@@ -529,7 +528,7 @@ server<-function(input, output,session){
       #### create the design
       designRef=tableDesign %>% filter(design==designType & NbR==NbRemoved) %>% select(designRef)
       
-      design=plot_design(dist_intra=dist_intra,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSize,lim=lim)
+      design=plot_design(dist_intra=dist_intra,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],lim=lim)
       
       if(origin==T){
         x_offset=design$design$x[1]
@@ -550,7 +549,7 @@ server<-function(input, output,session){
         
         designRef_I1=tableDesign %>% filter(design==designType_I1 & NbLines==NbLines_I1) %>% select(designRef)
         
-        I1=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I1,I_dist_inter =inter_dist_I1,I_designType = designRef_I1[[1]])
+        I1=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,lim = lim, I_dist_intra = intra_dist_I1,I_dist_inter =inter_dist_I1,I_designType = designRef_I1[[1]])
         
         if(origin==T){
           I1$designPalm$x=I1$designPalm$x-x_offset
@@ -570,7 +569,7 @@ server<-function(input, output,session){
       if ( NbLines_I2>0){
         designRef_I2=tableDesign %>% filter(design==designType_I2 & NbLines==NbLines_I2) %>% select(designRef)
         
-        I2=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I2,I_dist_inter =inter_dist_I2,I_designType = designRef_I2[[1]])
+        I2=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,lim = lim, I_dist_intra = intra_dist_I2,I_dist_inter =inter_dist_I2,I_designType = designRef_I2[[1]])
         
         if(origin==T){
           
@@ -593,7 +592,7 @@ server<-function(input, output,session){
         designRef_I3=tableDesign %>% filter(design==designType_I3 & NbLines==NbLines_I3) %>% select(designRef)
         
         
-        I3=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,orientation = orientation,pointSize =pointSize,lim = lim, I_dist_intra = intra_dist_I3,I_dist_inter =inter_dist_I3,I_designType = designRef_I3[[1]])
+        I3=design_intercrop(dist_intra =dist_intra,dist_inter =dist_inter,designType =designRef[[1]],dist_intercrop =dist_intercrop,lim = lim, I_dist_intra = intra_dist_I3,I_dist_inter =inter_dist_I3,I_designType = designRef_I3[[1]])
         
         if(origin==T){
           
@@ -616,7 +615,7 @@ server<-function(input, output,session){
       ### CropInLine 1
       if (!is.na(intra_distC1)){
         
-        C1=plot_design(dist_intra=intra_distC1,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],orientation=orientation,pointSize=pointSizeC1,lim=2*lim)
+        C1=plot_design(dist_intra=intra_distC1,dist_inter=dist_inter,dist_intercrop=dist_intercrop,designType=designRef[[1]],lim=2*lim)
         
         if(origin==T){
           C1$design$x=C1$design$x-x_offset
@@ -639,7 +638,7 @@ server<-function(input, output,session){
         designRefRep=tableDesign %>% filter(design==designTypeR & NbR==0) %>% select(designRef)
         
         
-        replanting=plot_design(dist_intra=intra_distR,dist_inter=inter_distR,dist_intercrop=0,designType=designRefRep[[1]],orientation=orientation,pointSize=pointSize,lim=2*lim)
+        replanting=plot_design(dist_intra=intra_distR,dist_inter=inter_distR,dist_intercrop=0,designType=designRefRep[[1]],lim=2*lim)
         
         if(origin==T){
           replanting$design$x=replanting$design$x-x_offset
@@ -749,7 +748,7 @@ server<-function(input, output,session){
   
   
   
-  #### graphic####
+  #### graphics####
   plot<-reactive({
     
     cond<- cond()
