@@ -353,8 +353,9 @@ display: none;
 
 
 <p>R.PEREZ (June 2024)</p>
-<div id="designing-oil-palm-based-intercropping-systems" class="section level1">
-<h1>Designing Oil Palm Based Intercropping Systems</h1>
+<div id="palmplanner-interactive-oil-palm-based-agroforestry-design-tool" class="section level1">
+<h1>PalmPlanner: Interactive Oil-Palm based Agroforestry Design
+Tool</h1>
 <ul>
 <li><a href="#description">Description</a></li>
 <li><a href="#install">Installation</a></li>
@@ -374,20 +375,16 @@ selected design.</p>
 <div id="install" class="section level2">
 <h2>Installation</h2>
 <p>To run this app, ensure you have installed R and R studio software
-(<a href="https://posit.co/" class="uri">https://posit.co/</a>). Then
-open the file Optipalmex_R.Rproj with RStudio. This will help R locate
-all the necessary data on your computer to run the code.</p>
-<p>Once RStudio is open, launch the file App_design.R. The code will
-appear in the RStudio console; click on the “Run App” button in the top
-right corner of the console window.</p>
+(<a href="https://posit.co/" class="uri">https://posit.co/</a>).</p>
+<p>Open the PalmPlanner.Rproj with RStudio, and open the ‘App_design.R’
+file in the bottom right window. The code will appear in the RStudio
+console; click on the “Run App” button in the top right corner of the
+console window.</p>
 <p>The following packages will be automatically installed:</p>
 <pre><code>shiny
 shinythemes
 shinycssloaders
-lubridate
-stringr
 tidyverse
-viridis
 plotly
 devtools</code></pre>
 <p>Additionally, the colourpicker package is required and will be
@@ -396,7 +393,7 @@ times to install all the packages.</p>
 </div>
 <div id="usage" class="section level2">
 <h2>Usage</h2>
-<p>On the right, you’ll find 5 tab sets where you can modify the
+<p>On the left, you’ll find 5 tab sets where you can modify the
 parameters for each crop. The first tab, <code>PALMS</code> contains
 arguments for designing the oil palm planting pattern. The
 <code>INTERCROP1</code>, <code>INTERCROP2</code> and
@@ -501,11 +498,10 @@ only a reset of the app will restore all the points.</p>
 <div id="notes" class="section level2">
 <h2>Notes</h2>
 <ul>
-<li>The density should be update when you remove plants. If not you may
-reset of the app.</li>
+<li>The density will be updated when you remove plants.</li>
 <li>You can click on legend to remove one species for the visualization.
 A double-click allows the visualization of one species</li>
-<li>It is easier to remove points at the end when all the oil plam and
+<li>It is easier to remove points at the end when all the oil palm and
 intercrops have been designed. You can select only the points of a
 particular species by double-clicking on the legend.</li>
 </ul>

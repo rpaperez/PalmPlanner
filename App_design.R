@@ -35,7 +35,7 @@ tableDesign=data.frame(designRef=c('square','quincunx',"square2",'quincunx2',"sq
 
 ui<-shinyUI(
   navbarPage(theme = shinytheme("sandstone"),
-             title ="Designing oil palm based intercropping systems",
+             title ="PalmPlanner: Interactive Oil-Palm based Agroforestry Design Tool",
              
              sidebarLayout( 
                sidebarPanel(

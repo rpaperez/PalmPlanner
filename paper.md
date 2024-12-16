@@ -1,15 +1,15 @@
-
+---
 title: 'PalmPlanner: A R-Shiny application for designing and visualizing spatial arrangement of oil palm-based agroforestry systems'
 tags:
   - R
-  - shiny
+  - R Shiny
   - agroforestry
   - planting design
-  - oil palm
+  - Elaeis guineensis
 authors:
   - name: Raphaël P-A Perez
     orcid: 0000-0001-5270-9212
-    affiliation: "1, 2"
+    affiliation: "1, 2" # (Multiple affiliations must be quoted)
   - name: Sylvain Rafflegeau
     orcid: 0000-0001-5267-1189
     affiliation: "3, 4"
@@ -38,6 +38,7 @@ affiliations:
 year: 2024
 bibliography: paper.bib
 
+---
 
 # Summary
 

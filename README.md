@@ -16,7 +16,7 @@ This Shiny app allows users to represent intercropping designs through different
 ## Installation {#install}
 To run this app, ensure you have installed R and R studio software (https://posit.co/).
 
-Once RStudio is open, launch the file App_design.R. The code will appear in the RStudio console; click on the "Run App" button in the top right corner of the console window.
+Open the PalmPlanner.Rproj with  RStudio, and open the 'App_design.R' file in the bottom right window. The code will appear in the RStudio console; click on the "Run App" button in the top right corner of the console window.
 
 The following packages will be automatically installed:
 
