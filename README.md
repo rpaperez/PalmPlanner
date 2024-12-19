@@ -31,8 +31,9 @@ Additionally, the colourpicker package is required and will be installed from Gi
 
 ## Usage {#usage}
 
-On the left, you'll find 5 tab sets where you can modify the parameters for each crop. The first tab, ``PALMS`` contains arguments for designing the oil palm planting pattern. The ``INTERCROP1``, ``INTERCROP2`` and ``INTERCROP3`` are for the intercrops,``CROP IN PALM ROW`` is for crops in rows of palm trees, ``REPLANTING`` is for representing an old planting, and ``REPLACE PALM`` is for replacing deleted palms in the design with an intercrop.
+On the left, you'll find 5 tab sets where you can modify the parameters for each crop (Figure 1). The first tab, ``PALMS`` contains arguments for designing the oil palm planting pattern. The ``INTERCROP1``, ``INTERCROP2`` and ``INTERCROP3`` are for the intercrops,``CROP IN PALM ROW`` is for crops in rows of palm trees, ``REPLANTING`` is for representing an old planting, and ``REPLACE PALM`` is for replacing deleted palms in the design with an intercrop.
 
+![Figure 1: PalmPlanner interface with the selection of input arguments in the left tabs, and the output design in the right panel. \label{fig:figure1}](JOSS/images/screenApp.png)
 
 ### Oil palm arguments
 

@@ -15,7 +15,7 @@ authors:
   orcid: "0000-0001-5267-1189"
   affiliation: 3, 4
 - name: Axel Labeyrie
-  orcid: null
+  orcid: 0009-0007-6169-5458
   affiliation: 5
 - name: Laurène Feintrenie
   orcid: "0000-0003-1621-396X"
@@ -37,7 +37,7 @@ affiliations:
   index: 3
 - name: INNOVATION, Univ. Montpellier, CIRAD, INRAE, Institut Agro, Montpellier, France
   index: 4
-- name: Afilliation Axel
+- name: UMR DIADE, CIRAD, Montpellier, France
   index: 5
 - name: TETIS
   index: 6
@@ -72,7 +72,7 @@ All specific interactive procedures are detailed in the README.md provided on th
 
 # Use-case
 
-In the context of the OptiPalMex project, the PalmPlanner application was utilized to create designs for each farmer involved in the project. Subsequently, before planting, farmers received an overview of their fields and had the opportunity to adjust the designs as needed. The use of the application during this phase enabled the development of new features to better address farmers' requests. Figure 2 presents examples of farmer designs that incorporate various features (Figure 2A: intercropping tabs, Figure 2B: replanting and replacing palms, Figure 2C: intercropping and planting in palm rows).
+In the context of the OptiPalMex project, the PalmPlanner application was utilized to create designs for each farmer involved in the project. Subsequently, before planting, farmers received an overview of their fields and had the opportunity to adjust the designs as needed. The use of the application during this phase enabled the development of new features to better address farmers' requests. Figure 2 presents examples of project designs that incorporate various features (Figure 2A: intercropping tabs, Figure 2B: replanting and replacing palms, Figure 2C: intercropping and planting in palm rows).
 
 ![Figure 2: Examples of designs generated with PalmPlanner. A) Double rows of oil palms planted following a quincunx design (intra-row = 9m, inter-row = 7.8m) and removing 1/3 oil palm row, intercropped with two cocoa rows following a quincunx design (intra-row = 3m, inter-row = 3m) and one row of bananas (intra-row = 9m). B) Square oil palm design (intra-row = 9m, inter-row = 9m) on replanting area (quincunx; intra-row = 9m, inter-row = 7.8m) with cedar trees replacing oil palm on the edges of the plot. C) Oil palm quincunx design (intra-row = 12m, inter-row = 8m) with one annual crop (beans) within the row (intra-row = 1.5m) and another one (maize) between rows of oil palm (intra-row = 2m). \label{fig:figure2}](images/Exemples.png)
 

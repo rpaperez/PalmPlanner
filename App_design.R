@@ -769,30 +769,32 @@ server<-function(input, output,session){
     
     
     # get voronoi limits (in m)
-    xmax_unit=(max(df$xmax))/(max(df$repCol))
-    ymax_unit=(max(df$ymax))/(max(df$repRows))
-    
+    xmax_unit=(max(df[df$type=='palms',]$xmax))/(max(df[df$type=='palms',]$repCol))
+    ymax_unit=(max(df[df$type=='palms',]$ymax))/(max(df[df$type=='palms',]$repRows))
+
     # number of voronoi replicated in lim
     repX=(lim+x_offset)%/%xmax_unit
     repY=(lim+y_offset)%/%ymax_unit
-    
+
     limX=repX*xmax_unit
     limY=repY*ymax_unit
     
-    ### removing offsets
+    print(paste('LimX=',limX))
+    print(paste('LimY=',limY))
     
-    df_sub=df %>% mutate(x=x+x_offset,y=y+y_offset) 
+    df_sub=df %>% mutate(x=x+x_offset,y=y+y_offset)
+    df_sub=df_sub%>% filter(x<=limX & y<=limY)
+    
+    ### removing offsets
     df_sub[df_sub$type=='old palms',]$x=df_sub[df_sub$type=='old palms',]$x-offset_X_R()
     df_sub[df_sub$type=='old palms',]$y=df_sub[df_sub$type=='old palms',]$y-offset_Y_R()
     df_sub[df_sub$type=='I1',]$y=df_sub[df_sub$type=='I1',]$y+offset_Y_I1()
     df_sub[df_sub$type=='I2',]$y=df_sub[df_sub$type=='I2',]$y+offset_Y_I2()
     df_sub[df_sub$type=='I3',]$y=df_sub[df_sub$type=='I3',]$y+offset_Y_I3()
     df_sub[df_sub$type=='C1',]$y=df_sub[df_sub$type=='C1',]$y+offset_Y_C1()
-    
-    
-    df_sub=df_sub%>%  filter(x<=limX & y<=limY)
-    
-    
+
+ 
+
     density_palms=paste(floor(nrow(df_sub[df_sub$type=='palms',])/((limX/100)*(limY/100))),'palms.ha-1')
     density_I1=paste(floor(nrow(df_sub[df_sub$type=='I1',])/((limX/100)*(limY/100))),input$Int1,'.ha-1')
     density_I2=paste(floor(nrow(df_sub[df_sub$type=='I2',])/((limX/100)*(limY/100))),input$Int2,'.ha-1')
@@ -801,6 +803,7 @@ server<-function(input, output,session){
     density_replacement=paste(floor(nrow(df_sub[df_sub$type=='replacement',])/((limX/100)*(limY/100))),input$Replace,'.ha-1')
     density_old=paste(floor(nrow(df_sub[df_sub$type=='old palms',])/((limX/100)*(limY/100))),'old palms.ha-1')
 
+    
     df[df$type=='palms','Id']=density_palms
     df[df$type=='I1','Id']=density_I1
     df[df$type=='I2','Id']=density_I2
