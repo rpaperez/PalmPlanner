@@ -19,7 +19,7 @@ authors:
   affiliation: 5
 - name: Laurène Feintrenie
   orcid: "0000-0003-1621-396X"
-  affiliation: 6, 7
+  affiliation: 6, 7, 8, 9
 output:
   html_document:
     df_print: paged
@@ -39,19 +39,23 @@ affiliations:
   index: 4
 - name: UMR DIADE, CIRAD, Montpellier, France
   index: 5
-- name: TETIS
+- name: CIRAD, UMR TETIS, 34398 Montpellier, France
   index: 6
-- name: ECOSUR
+- name: TETIS/ES, Univ. Montpellier, CIRAD, Montpellier, France
   index: 7
+- name: Inclusive green development, Tropical Agricultural Research and Higher Education Center (CATIE), Turrialba, Costa Rica
+  index: 8
+- name: Department of Sustainability Sciences, El Colegio de la Frontera Sur (ECOSUR). Campeche, Campeche, México
+  index: 9
 ---
 
 # Summary
 
-This paper presents a Shiny application to design and visualize to scale intercropping systems based on oil palm cultivation. The application features an interactive user interface that enables users to select various design patterns for oil palm, manage the number of rows to be removed for intercropping, and adjust the spacing between plants. Users can position intercrops or trees in lines or distribute them sparsely, either between or within the rows of oil palm. The primary objective is to streamline the planting and replanting process by providing access to the spatial arrangement of plants, estimating final density, and preventing the planting of new plants in areas previously occupied by oil palms during replanting.
+This paper presents a Shiny application to design and visualize at scale intercropping systems based on oil palm cultivation. The application features an interactive user interface that enables users to select various design patterns for oil palm, manage the number of rows not to be planted in oil palm to free space for intercropping, and adjust the distances between plants. Users can position intercrops or trees in lines or distribute them sparsely, either between or within the rows of oil palm. The primary objective is to streamline the planting and replanting process by providing access to the spatial arrangement of plants, estimating final density, and preventing the planting of new plants in areas previously occupied by oil palms in case of replanting.
 
 # Statement of need
 
-This application was developed as a tool for assisting farmers and researchers in designing innovative agroforestry systems in the context of the Optipalmex project [@Optipalmex], which aimed at supporting the creation of a network of oil palm plantations in Mexico. The application enables users to rapidly visualize different design of planting systems and assist them to better harness potential difficulties during the planting process. The output map can be used to estimate the coordinates of each plant relatively to a reference tree, assess the number of plants required for the planting,  prevent the co-location of new plants in stumps from felled old palms for replanting, and estimate the final density of each species. This application can also serve as a support tool for studies which investigate the representation of targeted ecosystem services in existing intercropped and agroforestry systems, by introducing the concept of Ecosystem Services functional Spatial Unit [@rafflegeau2023essu].
+This application was developed as a tool for assisting farmers, technicians and researchers in designing innovative agroforestry systems in the context of the Optipalmex project [@Optipalmex], which included the creation of a network of of innovative oil palm plantations within individual farms in southeastern states of Mexico. The application enables users to rapidly visualize different design of planting systems and assist them to better harness potential difficulties during the planting process. The output map can be used to estimate the coordinates of each plant relatively to a reference tree, assess the number of plants required for the planting,  prevent the co-location of new plants in stumps from felled old palms for replanting, and estimate the final density of each species. This application can also serve as a support tool for studies which investigate the representation of targeted ecosystem services in existing intercropped and agroforestry systems, by introducing the concept of Ecosystem Services functional Spatial Unit [@rafflegeau2023essu].
 Furthermore, future enhancements could include the exportation of the map with the typology of each species, as an input for more complex simulation models that simulate light on 3D plants [@perez2022architectural]. Such development could provide valuable insights into the competition for light among the species in the intercropped system and enhance users' ability to select plant spacing designs.
 
 
@@ -78,6 +82,6 @@ In the context of the OptiPalMex project, the PalmPlanner application was utiliz
 
 # Acknowledgements
 
-We acknowledge the contributions of the R community and the developers of the Shiny framework for providing the tools necessary to create this application. This work was support by the Optipalmex project funded by FASEP/PalmElit
+We acknowledge the contributions of the R community and the developers of the Shiny framework for providing the tools necessary to create this application. This work was supported by the Optipalmex research project in collaboration Cirad-PalmElit n°2021/17 and n°2024/15 with the support of the French Treasury through the Fund for Private Sector Studies (FASEP, AC/1301/MEXIQUE PALMELIT). 
 
 # References
