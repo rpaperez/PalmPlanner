@@ -9,16 +9,16 @@ tags:
 - Elaeis guineensis
 authors:
 - name: "Raphaël P-A Perez"
-  orcid: "0000-0001-5270-9212"
+  orcid: 0000-0001-5270-9212
   affiliation: 1, 2
 - name: Sylvain Rafflegeau
-  orcid: "0000-0001-5267-1189"
+  orcid: 0000-0001-5267-1189
   affiliation: 3, 4
 - name: Axel Labeyrie
   orcid: 0009-0007-6169-5458
   affiliation: 5
 - name: Laurène Feintrenie
-  orcid: "0000-0003-1621-396X"
+  orcid: 0000-0003-1621-396X
   affiliation: 6, 7, 8, 9
 output:
   html_document:
