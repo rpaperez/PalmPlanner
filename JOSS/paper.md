@@ -1,6 +1,6 @@
 ---
-title:'PalmPlanner: "A R-Shiny application for designing and visualizing spatial arrangement
-  of oil palm-based agroforestry systems'"
+title:'PalmPlanner: A R-Shiny application for designing and visualizing spatial arrangement
+  of oil palm-based agroforestry systems'
 tags:
 - R
 - R Shiny
