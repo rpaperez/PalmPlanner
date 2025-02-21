@@ -7,3 +7,6 @@ JOSS/paper.docx
 draft/
 .DS_Store
 .DS_Store
+JOSS/.DS_Store
+*.pper
+.DS_Store
